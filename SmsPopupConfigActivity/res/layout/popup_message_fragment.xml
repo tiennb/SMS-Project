@@ -38,6 +38,16 @@
                 android:paddingLeft="4dp" >
 
                 <TextView
+                    android:id="@+id/QuickReplyTextView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:ellipsize="marquee"
+                    android:lines="1"
+                    android:text="@string/quickreply_from_text"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                <TextView
                     android:id="@+id/fromTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -47,7 +57,7 @@
                     android:maxLines="2"
                     android:paddingBottom="2dp"
                     android:text="Text Here"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColorLink="?android:attr/textColorPrimaryDisableOnly"
                     tools:ignore="HardcodedText" />
 
@@ -76,19 +86,36 @@
             android:paddingBottom="9dp"
             android:paddingTop="5dp" >
 
-            <TextView
-                android:id="@+id/messageTextView"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autoLink="all"
                 android:gravity="center"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text="Text here"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?android:attr/textColorPrimaryDisableOnly"
-                android:textColorLink="?android:attr/textColorPrimaryDisableOnly"
-                tools:ignore="HardcodedText" />
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/messageTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="all"
+                    android:gravity="center"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Text here"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="?android:attr/textColorPrimaryDisableOnly"
+                    android:textColorLink="?android:attr/textColorPrimaryDisableOnly"
+                    tools:ignore="HardcodedText" />
+
+                <EditText
+                    android:id="@+id/QuickReplyEditText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionSend|flagNoEnterAction"
+                    android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
+                    android:maxLength="1000"
+                    android:maxLines="3"
+                    android:nextFocusRight="@+id/send_button" />
+            </LinearLayout>
         </ScrollView>
 
         <LinearLayout
@@ -97,10 +124,10 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:visibility="gone"
             android:orientation="vertical"
             android:paddingBottom="12dp"
-            android:paddingTop="12dp" >
+            android:paddingTop="12dp"
+            android:visibility="gone" >
 
             <TextView
                 android:id="@+id/mmsSubjectTextView"
@@ -132,9 +159,9 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:visibility="gone"
             android:paddingBottom="12dp"
-            android:paddingTop="12dp" >
+            android:paddingTop="12dp"
+            android:visibility="gone" >
 
             <ImageButton
                 android:id="@+id/viewButton"

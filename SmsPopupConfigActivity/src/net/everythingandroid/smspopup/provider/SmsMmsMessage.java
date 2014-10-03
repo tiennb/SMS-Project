@@ -140,6 +140,7 @@ public class SmsMmsMessage {
         // list. If so, we have all unread messages, if not, we need to add one to the count.
         locateMessageId();
         unreadCount = 1;
+        
         final ArrayList<SmsMmsMessage> unreadMessages = SmsPopupUtils.getUnreadMessages(context);
         if (unreadMessages != null) {
             final int size = unreadMessages.size();

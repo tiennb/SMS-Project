@@ -637,6 +637,7 @@ public class SmsPopupUtils {
     }
 
     public static ArrayList<SmsMmsMessage> getUnreadMessages(Context context) {
+    	
         final ArrayList<SmsMmsMessage> messages = getUnreadSms(context);
         final ArrayList<SmsMmsMessage> mmsMessages = getUnreadMms(context);
         final HashSet<Long> localReadMessages = getLocalReadMessages(context);
