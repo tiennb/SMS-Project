@@ -196,7 +196,7 @@ public class SmsReceiverService extends IntentService {
                 (!onlyShowOnKeyguard && !SmsPopupUtils.inMessagingApp(context)))) {
 
             if (BuildConfig.DEBUG)
-                Log.v("^^^^^^Showing SMS Popup");
+                Log.v("Showing SMS Popup: " + message.getAddress());
             ManageWakeLock.acquirePartial(context);
             context.startActivity(message.getPopupIntent());
 
