@@ -264,24 +264,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 			}
 		});
 
-//		// See if user wants to show buttons on the popup
-//		if (!mPrefs.getBoolean(getString(R.string.pref_show_buttons_key),
-//				Defaults.PREFS_SHOW_BUTTONS)) {
-//			showButtons = false;
-//		} else {
-//
-//			buttonTypes = new int[] {
-//					Integer.parseInt(mPrefs.getString(
-//							getString(R.string.pref_button1_key),
-//							Defaults.PREFS_BUTTON1)),
-//					Integer.parseInt(mPrefs.getString(
-//							getString(R.string.pref_button2_key),
-//							Defaults.PREFS_BUTTON2)),
-//					Integer.parseInt(mPrefs.getString(
-//							getString(R.string.pref_button3_key),
-//							Defaults.PREFS_BUTTON3)), };
-//		}
-
 		refreshViews();
 		resizeLayout();
 	}
@@ -341,6 +323,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 			} else {
 				// Otherwise we now have an array of unread messages
 				final long messageId = newMessage.getMessageId();
+				final String phone = newMessage.getAddress();
 				// We have to deal with a system race condition now, what if the
 				// new message isn't
 				// yet in the system database? In that case, messageId will be 0
@@ -357,6 +340,8 @@ public class SmsPopupActivity extends FragmentActivity implements
 					boolean found = false;
 					for (int i = 0; i < messages.size(); i++) {
 						if (messages.get(i).getMessageId() == messageId) {
+							
+							android.util.Log.i("new messages", messages.get(i).getMessageId() +"");
 							// It was found in the getUnreadMessages() query
 							found = true;
 							messages.get(i).setNotify(true);
@@ -387,6 +372,8 @@ public class SmsPopupActivity extends FragmentActivity implements
 		@Override
 		protected void onPostExecute(ArrayList<SmsMmsMessage> result) {
 			mProgressBar.setVisibility(View.GONE);
+			
+			
 			smsPopupPager.addMessages(result);
 			smsPopupPager.showLast();
 			wakeApp();
