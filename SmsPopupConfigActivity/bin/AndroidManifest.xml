@@ -65,6 +65,7 @@
             android:name=".ui.SmsPopupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="user"
             android:taskAffinity="net.everythingandroid.smspopup.popup"
             android:theme="@style/DialogTheme" >

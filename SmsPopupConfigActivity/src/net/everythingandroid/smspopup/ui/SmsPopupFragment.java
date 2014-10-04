@@ -1,5 +1,7 @@
 package net.everythingandroid.smspopup.ui;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
 import net.everythingandroid.smspopup.BuildConfig;
@@ -8,40 +10,41 @@ import net.everythingandroid.smspopup.preferences.ButtonListPreference;
 import net.everythingandroid.smspopup.provider.SmsMmsMessage;
 import net.everythingandroid.smspopup.service.SmsPopupUtilsService;
 import net.everythingandroid.smspopup.util.Log;
-import net.everythingandroid.smspopup.util.SmsPopupUtils;
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.WakefulBroadcastReceiver;
-import android.support.v4.util.LruCache;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout.LayoutParams;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.QuickContactBadge;
-import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 public class SmsPopupFragment extends Fragment {
 	private SmsMmsMessage message;
 	private boolean messageViewed = false;
 
-	// private SmsPopupButtonsListener mButtonsListener;
+	 private SmsPopupButtonsListener mButtonsListener;
 	//
 	private TextView quickreplyTextView;
 	private EditText qrEditText;
@@ -60,7 +63,7 @@ public class SmsPopupFragment extends Fragment {
 	// private boolean showButtons = true;
 
 	// private QuickContactBadge contactBadge;
-	private ImageView contactBadge;
+	private ImageView imgContactPhoto, imgEmotion;
 	// private ViewSwitcher buttonViewSwitcher;
 
 	public static final int PRIVACY_MODE_OFF = 0;
@@ -115,10 +118,6 @@ public class SmsPopupFragment extends Fragment {
 			Bundle savedInstanceState) {
 
 		final Bundle args = getArguments();
-//		privacyMode = args.getInt(EXTRA_PRIVACY_MODE);
-//		showUnlockButton = args.getBoolean(EXTRA_UNLOCK_BUTTON);
-//		showButtons = args.getBoolean(EXTRA_SHOW_BUTTONS);
-//		final int[] buttons = args.getIntArray(EXTRA_BUTTONS);
 		message = new SmsMmsMessage(getActivity(), args);
 
 		View v = inflater.inflate(R.layout.custom_sms_dialog, container,
@@ -128,86 +127,76 @@ public class SmsPopupFragment extends Fragment {
 		qrEditText = (EditText) v.findViewById(R.id.QuickReplyEditText);
 
 		// Find the main textviews and layouts
+		
+		imgEmotion = (ImageView) v.findViewById(R.id.imgEmotion);
 		fromTv = (TextView) v.findViewById(R.id.fromTextView);
 		messageTv = (TextView) v.findViewById(R.id.messageTextView);
 		//timestampTv = (TextView) v.findViewById(R.id.timestampTextView);
 		//contentMessage = (ScrollView) v.findViewById(R.id.contentMessage);
 		//contentMms = (LinearLayout) v.findViewById(R.id.contentMms);
-		//contentPrivacy = (LinearLayout) v.findViewById(R.id.contentPrivacy);
-
-//		buttonViewSwitcher = (ViewSwitcher) v
-//				.findViewById(R.id.buttonViewSwitcher);
-//		mainLayout = (LinearLayout) v.findViewById(R.id.popupMessageMainlayout);
 
 		// Find the QuickContactBadge view that will show the contact photo
-		contactBadge = (ImageView) v.findViewById(R.id.contactBadge);
-
+		imgContactPhoto = (ImageView) v.findViewById(R.id.imgAvatar);
+//
 //		final String[] buttonText = getResources().getStringArray(
 //				R.array.buttons_text);
+		
+	//	android.util.Log.i("buttonText: ", buttons[0]+ " " + buttonText[buttons[0]]);
 
 //		if (showButtons) {
-//			final Button button1 = (Button) v.findViewById(R.id.button1);
+			final ImageView button1 = (ImageView) v.findViewById(R.id.imgCancel);
 //			final PopupButton button1Vals = new PopupButton(buttons[0],
 //					buttonText);
-//			button1.setOnClickListener(button1Vals);
-//			button1.setVisibility(button1Vals.buttonVisibility);
-//			button1.setText(button1Vals.buttonText);
-//
-//			final Button button2 = (Button) v.findViewById(R.id.button2);
-//			final PopupButton button2Vals = new PopupButton(buttons[1],
-//					buttonText);
-//			button2.setOnClickListener(button2Vals);
-//			button2.setVisibility(button2Vals.buttonVisibility);
-//			button2.setText(button2Vals.buttonText);
-//
-//			final Button button3 = (Button) v.findViewById(R.id.button3);
-//			final PopupButton button3Vals = new PopupButton(buttons[2],
-//					buttonText);
-//			//button3.setOnClickListener(button3Vals);
-//			button3.setVisibility(button3Vals.buttonVisibility);
-//			button3.setText(button3Vals.buttonText);
-//
-//			final Button qrSendButton = (Button) v
-//					.findViewById(R.id.send_button);
-//
-//			/*
-//			 * This is really hacky. There are two types of reply buttons (quick
-//			 * reply and reply). If the user has selected to show both the
-//			 * replies then the text on the buttons should be different. If they
-//			 * only use one then the text can just be "Reply".
-//			 */
-//			int numReplyButtons = 0;
-//			if (button1Vals.isReplyButton)
-//				numReplyButtons++;
-//			if (button2Vals.isReplyButton)
-//				numReplyButtons++;
-//			if (button3Vals.isReplyButton)
-//				numReplyButtons++;
-//
-//			if (numReplyButtons == 1) {
-//				if (button1Vals.isReplyButton)
-//					button1.setText(R.string.button_reply);
-//				if (button2Vals.isReplyButton)
-//					button2.setText(R.string.button_reply);
-//				if (button3Vals.isReplyButton)
-//					button3.setText(R.string.button_reply);
-//			}
-//
-//			((Button) v.findViewById(R.id.unlockButton))
-//					.setOnClickListener(new OnClickListener() {
-//						@Override
-//						public void onClick(View v) {
-//							mButtonsListener.onButtonClicked(BUTTON_UNLOCK);
-//						}
-//					});
-//
-//			button3.setOnClickListener(new OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					sendQuickReply(qrEditText.getText().toString());
-//				}
-//			});
-//		}
+			button1.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					if (mButtonsListener !=null) {
+						mButtonsListener.onButtonClicked(1);
+					}else {
+						
+					}
+					
+				}
+			});
+			
+			
+			final ImageView imgEnter = (ImageView) v.findViewById(R.id.imgEnter);
+			qrEditText.addTextChangedListener(new TextWatcher() {
+
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before,
+						int count) {
+					if (qrEditText.getText().toString().length() > 0) {
+						imgEnter.setImageResource(R.drawable.ic_enter);
+						imgEnter.setEnabled(true);
+					} else {
+						imgEnter.setImageResource(R.drawable.ic_enter_disable);
+						imgEnter.setEnabled(false);
+					}
+
+				}
+
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count,
+						int after) {
+
+				}
+
+				@Override
+				public void afterTextChanged(Editable s) {
+
+				}
+			});
+			
+			imgEnter.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					sendQuickReply(qrEditText.getText().toString());
+					mButtonsListener.onButtonClicked(1);
+				}
+			});
 
 //		if (message.isMms()) {
 //			// The ViewMMS button
@@ -224,15 +213,6 @@ public class SmsPopupFragment extends Fragment {
 //				mmsSubjectTV.setVisibility(View.GONE);
 //			}
 //		}
-//
-//		// The privacy view message button
-//		((ImageButton) v.findViewById(R.id.viewButton))
-//				.setOnClickListener(new OnClickListener() {
-//					@Override
-//					public void onClick(View v) {
-//						mButtonsListener.onButtonClicked(BUTTON_VIEW);
-//					}
-//				});
 
 		populateViews();
 
@@ -243,7 +223,7 @@ public class SmsPopupFragment extends Fragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			//mButtonsListener = (SmsPopupButtonsListener) activity;
+			mButtonsListener = (SmsPopupButtonsListener) activity;
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
 					+ " must implement SmsPopupButtonsListener");
@@ -264,10 +244,40 @@ public class SmsPopupFragment extends Fragment {
 
 		// Set the from, message and header views
 		fromTv.setText(message.getAddress());
-		timestampTv.setText(message.getFormattedTimestamp());
+		
+		Bitmap bm = setPhoto(message.getAddress());
+		
+		if (bm != null) {
+			imgContactPhoto.setImageBitmap(bm);
+		}
+		
+		
+		//loadContactPhoto();
+		//timestampTv.setText(message.getFormattedTimestamp());
 
 		//setPrivacy(privacyMode, true);
 		//refreshButtonViews();
+	}
+	
+	public Bitmap setPhoto(String phone) {
+
+		Bitmap photo = null;
+
+		try {
+			Uri contact_Uri = Uri.withAppendedPath(
+					ContactsContract.Contacts.CONTENT_URI,
+					fetchContactIdByPhone(phone));
+			InputStream photo_stream = ContactsContract.Contacts
+					.openContactPhotoInputStream(getActivity().getContentResolver(),
+							contact_Uri);
+			BufferedInputStream buf = new BufferedInputStream(photo_stream);
+			photo = BitmapFactory.decodeStream(buf);
+		} catch (Exception e) {
+			return null;
+		}
+
+		return photo;
+
 	}
 
 	/**
@@ -390,7 +400,6 @@ public class SmsPopupFragment extends Fragment {
 //		}
 //	}
 
-	private void loadContactPhoto() {
 //		boolean cacheHit = false;
 //		if (mButtonsListener != null && message.getContactLookupUri() != null) {
 //			final LruCache<Uri, Bitmap> cache = mButtonsListener.getCache();
@@ -417,11 +426,32 @@ public class SmsPopupFragment extends Fragment {
 //		} else {
 //			contactBadge.assignContactFromPhone(message.getAddress(), false);
 //		}
+		
+	public String fetchContactIdByPhone(String phoneNumber) {
+		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
+				Uri.encode(phoneNumber));
+		Cursor cursor = getActivity().getContentResolver().query(uri,
+				new String[] { PhoneLookup.DISPLAY_NAME, PhoneLookup._ID },
+				null, null, null);
+
+		String contactId = "";
+
+		try {
+			if (cursor.moveToFirst()) {
+				contactId = cursor.getString(cursor
+						.getColumnIndex(PhoneLookup._ID));
+				if (contactId != null) {
+					return contactId;
+				}
+			}
+		} finally {
+			cursor.close();
+		}
+
+		return null;
+
 	}
 
-	/**
-	 * AsyncTask to fetch contact photo in background
-	 */
 	private class FetchContactPhotoTask extends AsyncTask<Uri, Integer, Bitmap> {
 		private final WeakReference<QuickContactBadge> viewReference;
 
@@ -495,14 +525,14 @@ public class SmsPopupFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
-			//mButtonsListener.onButtonClicked(buttonId);
+			mButtonsListener.onButtonClicked(buttonId);
 		}
 	}
 
 	public static interface SmsPopupButtonsListener {
 		abstract void onButtonClicked(int buttonType);
 
-		abstract LruCache<Uri, Bitmap> getCache();
+		//abstract LruCache<Uri, Bitmap> getCache();
 	}
 
 }
