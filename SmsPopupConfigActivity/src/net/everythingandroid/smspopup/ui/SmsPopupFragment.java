@@ -3,14 +3,18 @@ package net.everythingandroid.smspopup.ui;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import net.everythingandroid.smspopup.BuildConfig;
 import net.everythingandroid.smspopup.R;
 import net.everythingandroid.smspopup.preferences.ButtonListPreference;
+import net.everythingandroid.smspopup.provider.GridEmotionAdapter;
+import net.everythingandroid.smspopup.provider.IConstant;
 import net.everythingandroid.smspopup.provider.SmsMmsMessage;
 import net.everythingandroid.smspopup.service.SmsPopupUtilsService;
 import net.everythingandroid.smspopup.util.Log;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -30,21 +34,31 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 public class SmsPopupFragment extends Fragment {
 	private SmsMmsMessage message;
 	private boolean messageViewed = false;
-
-	 private SmsPopupButtonsListener mButtonsListener;
+	
+	private InputMethodManager inputManager;
+	private View inputView;
+	
+	private SmsPopupButtonsListener mButtonsListener;
 	//
 	private TextView quickreplyTextView;
 	private EditText qrEditText;
@@ -56,7 +70,7 @@ public class SmsPopupFragment extends Fragment {
 	// private ScrollView contentMessage;
 	// private LinearLayout contentMms;
 	// private LinearLayout contentPrivacy;
-	private int contentNum = 0;
+	//private int contentNum = 0;
 
 	// private int privacyMode = PRIVACY_MODE_OFF;
 	// private boolean showUnlockButton = false;
@@ -120,99 +134,106 @@ public class SmsPopupFragment extends Fragment {
 		final Bundle args = getArguments();
 		message = new SmsMmsMessage(getActivity(), args);
 
-		View v = inflater.inflate(R.layout.custom_sms_dialog, container,
-				false);
+		View v = inflater.inflate(R.layout.custom_sms_dialog, container, false);
 
 		quickreplyTextView = (TextView) v.findViewById(R.id.QuickReplyTextView);
 		qrEditText = (EditText) v.findViewById(R.id.QuickReplyEditText);
 
 		// Find the main textviews and layouts
-		
+
 		imgEmotion = (ImageView) v.findViewById(R.id.imgEmotion);
 		fromTv = (TextView) v.findViewById(R.id.fromTextView);
 		messageTv = (TextView) v.findViewById(R.id.messageTextView);
-		//timestampTv = (TextView) v.findViewById(R.id.timestampTextView);
-		//contentMessage = (ScrollView) v.findViewById(R.id.contentMessage);
-		//contentMms = (LinearLayout) v.findViewById(R.id.contentMms);
+		// timestampTv = (TextView) v.findViewById(R.id.timestampTextView);
+		// contentMessage = (ScrollView) v.findViewById(R.id.contentMessage);
+		// contentMms = (LinearLayout) v.findViewById(R.id.contentMms);
 
 		// Find the QuickContactBadge view that will show the contact photo
 		imgContactPhoto = (ImageView) v.findViewById(R.id.imgAvatar);
-//
-//		final String[] buttonText = getResources().getStringArray(
-//				R.array.buttons_text);
-		
-	//	android.util.Log.i("buttonText: ", buttons[0]+ " " + buttonText[buttons[0]]);
+		//
+		// final String[] buttonText = getResources().getStringArray(
+		// R.array.buttons_text);
 
-//		if (showButtons) {
-			final ImageView button1 = (ImageView) v.findViewById(R.id.imgCancel);
-//			final PopupButton button1Vals = new PopupButton(buttons[0],
-//					buttonText);
-			button1.setOnClickListener(new OnClickListener() {
+		// android.util.Log.i("buttonText: ", buttons[0]+ " " +
+		// buttonText[buttons[0]]);
+
+		imgEmotion.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				onClickEmotion(imgEmotion);
 				
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					if (mButtonsListener !=null) {
-						mButtonsListener.onButtonClicked(1);
-					}else {
-						
-					}
-					
-				}
-			});
-			
-			
-			final ImageView imgEnter = (ImageView) v.findViewById(R.id.imgEnter);
-			qrEditText.addTextChangedListener(new TextWatcher() {
+			}
+		});
+		
+		// if (showButtons) {
+		final ImageView button1 = (ImageView) v.findViewById(R.id.imgCancel);
+		// final PopupButton button1Vals = new PopupButton(buttons[0],
+		// buttonText);
+		button1.setOnClickListener(new OnClickListener() {
 
-				@Override
-				public void onTextChanged(CharSequence s, int start, int before,
-						int count) {
-					if (qrEditText.getText().toString().length() > 0) {
-						imgEnter.setImageResource(R.drawable.ic_enter);
-						imgEnter.setEnabled(true);
-					} else {
-						imgEnter.setImageResource(R.drawable.ic_enter_disable);
-						imgEnter.setEnabled(false);
-					}
-
-				}
-
-				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count,
-						int after) {
-
-				}
-
-				@Override
-				public void afterTextChanged(Editable s) {
-
-				}
-			});
-			
-			imgEnter.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					sendQuickReply(qrEditText.getText().toString());
+			@Override
+			public void onClick(View v) {
+				if (mButtonsListener != null) {
 					mButtonsListener.onButtonClicked(1);
-				}
-			});
+				} else {
 
-//		if (message.isMms()) {
-//			// The ViewMMS button
-//			((Button) v.findViewById(R.id.viewMmsButton))
-//					.setOnClickListener(new PopupButton(BUTTON_VIEW_MMS,
-//							buttonText));
-//			final String mmsSubject = message.getMessageBody();
-//			final TextView mmsSubjectTV = ((TextView) v
-//					.findViewById(R.id.mmsSubjectTextView));
-//			if (mmsSubject != null && !"".equals(mmsSubject)
-//					&& !EMPTY_MMS_SUBJECT.equals(mmsSubject)) {
-//				mmsSubjectTV.setText(message.getMessageBody());
-//			} else {
-//				mmsSubjectTV.setVisibility(View.GONE);
-//			}
-//		}
+				}
+
+			}
+		});
+
+		final ImageView imgEnter = (ImageView) v.findViewById(R.id.imgEnter);
+		qrEditText.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+				if (qrEditText.getText().toString().length() > 0) {
+					imgEnter.setImageResource(R.drawable.ic_enter);
+					imgEnter.setEnabled(true);
+				} else {
+					imgEnter.setImageResource(R.drawable.ic_enter_disable);
+					imgEnter.setEnabled(false);
+				}
+
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+
+			}
+		});
+
+		imgEnter.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				sendQuickReply(qrEditText.getText().toString());
+				mButtonsListener.onButtonClicked(1);
+			}
+		});
+
+		// if (message.isMms()) {
+		// // The ViewMMS button
+		// ((Button) v.findViewById(R.id.viewMmsButton))
+		// .setOnClickListener(new PopupButton(BUTTON_VIEW_MMS,
+		// buttonText));
+		// final String mmsSubject = message.getMessageBody();
+		// final TextView mmsSubjectTV = ((TextView) v
+		// .findViewById(R.id.mmsSubjectTextView));
+		// if (mmsSubject != null && !"".equals(mmsSubject)
+		// && !EMPTY_MMS_SUBJECT.equals(mmsSubject)) {
+		// mmsSubjectTV.setText(message.getMessageBody());
+		// } else {
+		// mmsSubjectTV.setVisibility(View.GONE);
+		// }
+		// }
 
 		populateViews();
 
@@ -244,21 +265,20 @@ public class SmsPopupFragment extends Fragment {
 
 		// Set the from, message and header views
 		fromTv.setText(message.getAddress());
-		
+
 		Bitmap bm = setPhoto(message.getAddress());
-		
+
 		if (bm != null) {
 			imgContactPhoto.setImageBitmap(bm);
 		}
-		
-		
-		//loadContactPhoto();
-		//timestampTv.setText(message.getFormattedTimestamp());
 
-		//setPrivacy(privacyMode, true);
-		//refreshButtonViews();
+		// loadContactPhoto();
+		// timestampTv.setText(message.getFormattedTimestamp());
+
+		// setPrivacy(privacyMode, true);
+		// refreshButtonViews();
 	}
-	
+
 	public Bitmap setPhoto(String phone) {
 
 		Bitmap photo = null;
@@ -268,8 +288,8 @@ public class SmsPopupFragment extends Fragment {
 					ContactsContract.Contacts.CONTENT_URI,
 					fetchContactIdByPhone(phone));
 			InputStream photo_stream = ContactsContract.Contacts
-					.openContactPhotoInputStream(getActivity().getContentResolver(),
-							contact_Uri);
+					.openContactPhotoInputStream(getActivity()
+							.getContentResolver(), contact_Uri);
 			BufferedInputStream buf = new BufferedInputStream(photo_stream);
 			photo = BitmapFactory.decodeStream(buf);
 		} catch (Exception e) {
@@ -308,125 +328,171 @@ public class SmsPopupFragment extends Fragment {
 			}
 		}
 	}
+	
+	public void onClickEmotion(View v) {
+		LayoutInflater layoutInflater = (LayoutInflater) getActivity().getBaseContext()
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-//	public void resizeLayout(int newWidth, int screenWidth) {
-//		LayoutParams params = (LayoutParams) mainLayout.getLayoutParams();
-//		params.width = newWidth;
-//		mainLayout.setLayoutParams(params);
-//	}
-//
-//	public void setShowUnlockButton(boolean show) {
-//		if (show != showUnlockButton) {
-//			showUnlockButton = show;
-//			refreshButtonViews();
-//		}
-//	}
+		View popupView = layoutInflater.inflate(R.layout.popup_emotion, null);
+		final PopupWindow popupWindow = new PopupWindow(popupView,
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
-//	private void refreshButtonViews() {
-//		if (!showButtons) {
-//			buttonViewSwitcher.setVisibility(View.GONE);
-//		} else {
-//			final int currentView = buttonViewSwitcher.getDisplayedChild();
-//			if (showUnlockButton) {
-//				if (currentView != BUTTON_SWITCHER_UNLOCK_BUTTON) {
-//					// Show unlock button
-//					buttonViewSwitcher
-//							.setDisplayedChild(BUTTON_SWITCHER_UNLOCK_BUTTON);
-//				}
-//			} else {
-//				if (currentView != BUTTON_SWITCHER_MAIN_BUTTONS) {
-//					// Show main popup buttons
-//					buttonViewSwitcher
-//							.setDisplayedChild(BUTTON_SWITCHER_MAIN_BUTTONS);
-//				}
-//			}
-//		}
-//	}
-//
-//	public void setPrivacy(int newMode) {
-//		setPrivacy(newMode, false);
-//	}
-//
-//	private void setPrivacy(int newMode, boolean initial) {
-//
-//		if ((newMode != privacyMode || initial) && message != null) {
-//			final int viewPrivacy = message.isSms() ? VIEW_PRIVACY_SMS
-//					: VIEW_PRIVACY_MMS;
-//
-//			final int viewPrivacyOff = message.isSms() ? VIEW_SMS : VIEW_MMS;
-//
-//			if (newMode == PRIVACY_MODE_OFF) {
-//				updateContentView(viewPrivacyOff);
-//				fromTv.setVisibility(View.VISIBLE);
-//				messageViewed = true;
-//				if (initial || privacyMode == PRIVACY_MODE_HIDE_ALL) {
-//					loadContactPhoto();
-//				}
-//			} else if (newMode == PRIVACY_MODE_HIDE_MESSAGE) {
-//				updateContentView(viewPrivacy);
-//				fromTv.setVisibility(View.VISIBLE);
-//				loadContactPhoto();
-//			} else if (newMode == PRIVACY_MODE_HIDE_ALL) {
-//				updateContentView(viewPrivacy);
-//				fromTv.setVisibility(View.GONE);
-//			}
-//		}
-//		privacyMode = newMode;
-//	}
+		final GridView gridEmotion = (GridView) popupView
+				.findViewById(R.id.gridEmo);
 
-//	private void updateContentView(int mode) {
-//		if (contentMessage != null && contentMms != null
-//				&& contentPrivacy != null) {
-//			if (contentNum != mode) {
-//				contentNum = mode;
-//				switch (mode) {
-//				case VIEW_SMS:
-//					contentMessage.setVisibility(View.VISIBLE);
-//					contentMms.setVisibility(View.GONE);
-//					contentPrivacy.setVisibility(View.GONE);
-//					break;
-//				case VIEW_MMS:
-//					contentMessage.setVisibility(View.GONE);
-//					contentMms.setVisibility(View.VISIBLE);
-//					contentPrivacy.setVisibility(View.GONE);
-//					break;
-//				case VIEW_PRIVACY_SMS:
-//					contentMessage.setVisibility(View.GONE);
-//					contentMms.setVisibility(View.GONE);
-//					contentPrivacy.setVisibility(View.VISIBLE);
-//					break;
-//				}
-//			}
-//		}
-//	}
+		ArrayList<String> emoList = new ArrayList<String>();
 
-//		boolean cacheHit = false;
-//		if (mButtonsListener != null && message.getContactLookupUri() != null) {
-//			final LruCache<Uri, Bitmap> cache = mButtonsListener.getCache();
-//			if (cache != null) {
-//				final Bitmap bitmap = cache.get(message.getContactLookupUri());
-//				if (bitmap != null) {
-//					if (BuildConfig.DEBUG)
-//						Log.v("loadContactPhoto() - bitmap cache hit");
-//					contactBadge.setImageBitmap(bitmap);
-//					cacheHit = true;
-//				}
-//			}
-//		}
-//
-//		if (!cacheHit) {
-//			new FetchContactPhotoTask(contactBadge).execute(message
-//					.getContactLookupUri());
-//		}
-//
-//		contactBadge.setClickable(true);
-//		final Uri contactUri = message.getContactLookupUri();
-//		if (contactUri != null) {
-//			contactBadge.assignContactUri(message.getContactLookupUri());
-//		} else {
-//			contactBadge.assignContactFromPhone(message.getAddress(), false);
-//		}
+		for (int i = 0; i < IConstant.emotions.length; i++) {
+			emoList.add(IConstant.emotions[i]);
+		}
+
+		gridEmotion.setAdapter(new GridEmotionAdapter(getActivity().getApplicationContext(), emoList));
+
+		// Closes the popup window when touch outside of it - when looses focus
+		popupWindow.setOutsideTouchable(true);
+		// /popupWindow.setFocusable(true);
+		// Removes default black background
+		popupWindow
+				.setBackgroundDrawable(new BitmapDrawable(getResources(), ""));
+		popupWindow.setFocusable(true);
+		gridEmotion.setClickable(true);
+		gridEmotion.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View v,
+					int position, long id) {
+
+				qrEditText.setText(qrEditText.getText().toString()
+						+ IConstant.emotions[position]);
+				qrEditText.setSelection(qrEditText.getText().length());
+
+				popupWindow.dismiss();
+				getActivity().getWindow()
+						.setSoftInputMode(
+								WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+			}
+		});
+
+		popupWindow.showAsDropDown(v, 0, -600);
 		
+	}
+
+	// public void resizeLayout(int newWidth, int screenWidth) {
+	// LayoutParams params = (LayoutParams) mainLayout.getLayoutParams();
+	// params.width = newWidth;
+	// mainLayout.setLayoutParams(params);
+	// }
+	//
+	// public void setShowUnlockButton(boolean show) {
+	// if (show != showUnlockButton) {
+	// showUnlockButton = show;
+	// refreshButtonViews();
+	// }
+	// }
+
+	// private void refreshButtonViews() {
+	// if (!showButtons) {
+	// buttonViewSwitcher.setVisibility(View.GONE);
+	// } else {
+	// final int currentView = buttonViewSwitcher.getDisplayedChild();
+	// if (showUnlockButton) {
+	// if (currentView != BUTTON_SWITCHER_UNLOCK_BUTTON) {
+	// // Show unlock button
+	// buttonViewSwitcher
+	// .setDisplayedChild(BUTTON_SWITCHER_UNLOCK_BUTTON);
+	// }
+	// } else {
+	// if (currentView != BUTTON_SWITCHER_MAIN_BUTTONS) {
+	// // Show main popup buttons
+	// buttonViewSwitcher
+	// .setDisplayedChild(BUTTON_SWITCHER_MAIN_BUTTONS);
+	// }
+	// }
+	// }
+	// }
+	//
+	// public void setPrivacy(int newMode) {
+	// setPrivacy(newMode, false);
+	// }
+	//
+	// private void setPrivacy(int newMode, boolean initial) {
+	//
+	// if ((newMode != privacyMode || initial) && message != null) {
+	// final int viewPrivacy = message.isSms() ? VIEW_PRIVACY_SMS
+	// : VIEW_PRIVACY_MMS;
+	//
+	// final int viewPrivacyOff = message.isSms() ? VIEW_SMS : VIEW_MMS;
+	//
+	// if (newMode == PRIVACY_MODE_OFF) {
+	// updateContentView(viewPrivacyOff);
+	// fromTv.setVisibility(View.VISIBLE);
+	// messageViewed = true;
+	// if (initial || privacyMode == PRIVACY_MODE_HIDE_ALL) {
+	// loadContactPhoto();
+	// }
+	// } else if (newMode == PRIVACY_MODE_HIDE_MESSAGE) {
+	// updateContentView(viewPrivacy);
+	// fromTv.setVisibility(View.VISIBLE);
+	// loadContactPhoto();
+	// } else if (newMode == PRIVACY_MODE_HIDE_ALL) {
+	// updateContentView(viewPrivacy);
+	// fromTv.setVisibility(View.GONE);
+	// }
+	// }
+	// privacyMode = newMode;
+	// }
+
+	// private void updateContentView(int mode) {
+	// if (contentMessage != null && contentMms != null
+	// && contentPrivacy != null) {
+	// if (contentNum != mode) {
+	// contentNum = mode;
+	// switch (mode) {
+	// case VIEW_SMS:
+	// contentMessage.setVisibility(View.VISIBLE);
+	// contentMms.setVisibility(View.GONE);
+	// contentPrivacy.setVisibility(View.GONE);
+	// break;
+	// case VIEW_MMS:
+	// contentMessage.setVisibility(View.GONE);
+	// contentMms.setVisibility(View.VISIBLE);
+	// contentPrivacy.setVisibility(View.GONE);
+	// break;
+	// case VIEW_PRIVACY_SMS:
+	// contentMessage.setVisibility(View.GONE);
+	// contentMms.setVisibility(View.GONE);
+	// contentPrivacy.setVisibility(View.VISIBLE);
+	// break;
+	// }
+	// }
+	// }
+	// }
+
+	// boolean cacheHit = false;
+	// if (mButtonsListener != null && message.getContactLookupUri() != null) {
+	// final LruCache<Uri, Bitmap> cache = mButtonsListener.getCache();
+	// if (cache != null) {
+	// final Bitmap bitmap = cache.get(message.getContactLookupUri());
+	// if (bitmap != null) {
+	// if (BuildConfig.DEBUG)
+	// Log.v("loadContactPhoto() - bitmap cache hit");
+	// contactBadge.setImageBitmap(bitmap);
+	// cacheHit = true;
+	// }
+	// }
+	// }
+	//
+	// if (!cacheHit) {
+	// new FetchContactPhotoTask(contactBadge).execute(message
+	// .getContactLookupUri());
+	// }
+	//
+	// contactBadge.setClickable(true);
+	// final Uri contactUri = message.getContactLookupUri();
+	// if (contactUri != null) {
+	// contactBadge.assignContactUri(message.getContactLookupUri());
+	// } else {
+	// contactBadge.assignContactFromPhone(message.getAddress(), false);
+	// }
+
 	public String fetchContactIdByPhone(String phoneNumber) {
 		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
 				Uri.encode(phoneNumber));
@@ -462,19 +528,19 @@ public class SmsPopupFragment extends Fragment {
 		@Override
 		protected Bitmap doInBackground(Uri... params) {
 			if (isAdded()) {
-//				if (BuildConfig.DEBUG)
-//					Log.v("Loading contact photo in background...");
-//				final Bitmap bitmap = SmsPopupUtils.getPersonPhoto(
-//						getActivity(), params[0]);
-//				if (mButtonsListener != null && bitmap != null) {
-//					final LruCache<Uri, Bitmap> cache = mButtonsListener
-//							.getCache();
-//					if (cache != null) {
-//						cache.put(params[0], bitmap);
-//					}
-//				}
+				// if (BuildConfig.DEBUG)
+				// Log.v("Loading contact photo in background...");
+				// final Bitmap bitmap = SmsPopupUtils.getPersonPhoto(
+				// getActivity(), params[0]);
+				// if (mButtonsListener != null && bitmap != null) {
+				// final LruCache<Uri, Bitmap> cache = mButtonsListener
+				// .getCache();
+				// if (cache != null) {
+				// cache.put(params[0], bitmap);
+				// }
+				// }
 
-				//return bitmap;
+				// return bitmap;
 			}
 			return null;
 		}
@@ -499,40 +565,69 @@ public class SmsPopupFragment extends Fragment {
 		}
 	}
 
-	private class PopupButton implements OnClickListener {
-		final private int buttonId;
-		public boolean isReplyButton;
-		public String buttonText;
-		public int buttonVisibility = View.VISIBLE;
-
-		public PopupButton(int id, String[] buttonTextArray) {
-			buttonId = id;
-			isReplyButton = false;
-			if (buttonId == ButtonListPreference.BUTTON_REPLY
-					|| buttonId == ButtonListPreference.BUTTON_QUICKREPLY
-					|| buttonId == ButtonListPreference.BUTTON_REPLY_BY_ADDRESS) {
-				isReplyButton = true;
-			}
-
-			if (buttonId < buttonTextArray.length) {
-				buttonText = buttonTextArray[buttonId];
-			}
-
-			if (buttonId == ButtonListPreference.BUTTON_DISABLED) { // Disabled
-				buttonVisibility = View.GONE;
-			}
+	// private class PopupButton implements OnClickListener {
+	// final private int buttonId;
+	// public boolean isReplyButton;
+	// public String buttonText;
+	// public int buttonVisibility = View.VISIBLE;
+	//
+	// public PopupButton(int id, String[] buttonTextArray) {
+	// buttonId = id;
+	// isReplyButton = false;
+	// if (buttonId == ButtonListPreference.BUTTON_REPLY
+	// || buttonId == ButtonListPreference.BUTTON_QUICKREPLY
+	// || buttonId == ButtonListPreference.BUTTON_REPLY_BY_ADDRESS) {
+	// isReplyButton = true;
+	// }
+	//
+	// if (buttonId < buttonTextArray.length) {
+	// buttonText = buttonTextArray[buttonId];
+	// }
+	//
+	// if (buttonId == ButtonListPreference.BUTTON_DISABLED) { // Disabled
+	// buttonVisibility = View.GONE;
+	// }
+	// }
+	//
+	// @Override
+	// public void onClick(View v) {
+	// mButtonsListener.onButtonClicked(buttonId);
+	// }
+	// }
+	
+	/**
+	 * Show the soft keyboard and store the view that triggered it
+	 */
+	private void showSoftKeyboard(View triggerView) {
+		if (BuildConfig.DEBUG)
+			Log.v("showSoftKeyboard()");
+		if (inputManager == null) {
+			inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 		}
+		inputView = triggerView;
+		inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+	}
 
-		@Override
-		public void onClick(View v) {
-			mButtonsListener.onButtonClicked(buttonId);
+	/**
+	 * Hide the soft keyboard
+	 */
+	private void hideSoftKeyboard() {
+		if (inputView == null)
+			return;
+		if (BuildConfig.DEBUG)
+			Log.v("hideSoftKeyboard()");
+		if (inputManager == null) {
+			inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 		}
+		inputManager.hideSoftInputFromWindow(
+				inputView.getApplicationWindowToken(), 0);
+		inputView = null;
 	}
 
 	public static interface SmsPopupButtonsListener {
 		abstract void onButtonClicked(int buttonType);
 
-		//abstract LruCache<Uri, Bitmap> getCache();
+		// abstract LruCache<Uri, Bitmap> getCache();
 	}
 
 }

@@ -76,7 +76,6 @@
             android:layout_marginLeft="5dp"
             android:background="@android:color/transparent"
             android:contentDescription="@null"
-            android:onClick="onClickEmotion"
             android:src="@drawable/ic_emotion" />
 
         <EditText
