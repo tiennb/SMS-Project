@@ -216,6 +216,7 @@ public class SmsPopupFragment extends Fragment {
 			public void onClick(View v) {
 				sendQuickReply(qrEditText.getText().toString());
 				mButtonsListener.onButtonClicked(1);
+				qrEditText.setText("");
 			}
 		});
 
@@ -259,8 +260,7 @@ public class SmsPopupFragment extends Fragment {
 		if (message.isSms()) {
 			messageTv.setText(message.getMessageBody());
 
-			quickreplyTextView.setText(getString(R.string.quickreply_from_text,
-					message.getContactName()));
+			quickreplyTextView.setText(message.getContactName());
 		}
 
 		// Set the from, message and header views
