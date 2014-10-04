@@ -233,7 +233,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 		});
 		
 		
-		registerForContextMenu(smsPopupPager);
+	//	registerForContextMenu(smsPopupPager);
 
 		RetainFragment mRetainFragment = RetainFragment
 				.findOrCreateRetainFragment(getSupportFragmentManager());
@@ -373,6 +373,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 		protected void onPostExecute(ArrayList<SmsMmsMessage> result) {
 			mProgressBar.setVisibility(View.GONE);
 			
+			android.util.Log.i("smsPopupPager.ADD:", result.size()+"");
 			
 			smsPopupPager.addMessages(result);
 			smsPopupPager.showLast();
@@ -388,16 +389,16 @@ public class SmsPopupActivity extends FragmentActivity implements
 	 * ************
 	 */
 	private void refreshViews() {
-		ManageKeyguard.initialize(this);
-		if ((ManageKeyguard.inKeyguardRestrictedInputMode() && showUnlockButton)
-				|| privacyMode != SmsPopupFragment.PRIVACY_MODE_OFF) {
-			unregisterForContextMenu(smsPopupPager);
-		} else {
-			showUnlockButton = false;
-			// Enable long-press context menu
-			registerForContextMenu(smsPopupPager);
-		//	smsPopupPagerAdapter.unlockScreen();
-		}
+//		ManageKeyguard.initialize(this);
+//		if ((ManageKeyguard.inKeyguardRestrictedInputMode() && showUnlockButton)
+//				|| privacyMode != SmsPopupFragment.PRIVACY_MODE_OFF) {
+//			unregisterForContextMenu(smsPopupPager);
+//		} else {
+//			showUnlockButton = false;
+//			// Enable long-press context menu
+//			//registerForContextMenu(smsPopupPager);
+//		//	smsPopupPagerAdapter.unlockScreen();
+//		}
 	}
 
 	private void resizeLayout() {
@@ -544,7 +545,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 			Log.v("SMSPopupActivity: onPause()");
 
 		// Hide the soft keyboard in case it was shown via quick reply
-		hideSoftKeyboard();
+		//hideSoftKeyboard();
 
 		// Shutdown Android TTS
 		if (androidTts != null) {
@@ -1137,34 +1138,34 @@ public class SmsPopupActivity extends FragmentActivity implements
 		removeActiveMessage();
 	}
 
-	/**
-	 * Sends the actual quick reply message
-	 */
-	private void sendQuickReply(String quickReplyMessage) {
-		hideSoftKeyboard();
-		if (quickReplyMessage != null) {
-			if (quickReplyMessage.length() > 0 && quickReplySmsMessage != null) {
-				Intent i = new Intent(
-						SmsPopupActivity.this.getApplicationContext(),
-						SmsPopupUtilsService.class);
-				i.setAction(SmsPopupUtilsService.ACTION_QUICKREPLY);
-				i.putExtras(quickReplySmsMessage.toBundle());
-				i.putExtra(SmsMmsMessage.EXTRAS_QUICKREPLY, quickReplyMessage);
-				if (BuildConfig.DEBUG)
-					Log.v("Sending message to "
-							+ quickReplySmsMessage.getContactName());
-				WakefulBroadcastReceiver.startWakefulService(
-						getApplicationContext(), i);
-				Toast.makeText(this, R.string.quickreply_sending_toast,
-						Toast.LENGTH_LONG).show();
-				dismissDialog(DIALOG_QUICKREPLY);
-				removeActiveMessage();
-			} else {
-				Toast.makeText(this, R.string.quickreply_nomessage_toast,
-						Toast.LENGTH_LONG).show();
-			}
-		}
-	}
+//	/**
+//	 * Sends the actual quick reply message
+//	 */
+//	private void sendQuickReply(String quickReplyMessage) {
+//		hideSoftKeyboard();
+//		if (quickReplyMessage != null) {
+//			if (quickReplyMessage.length() > 0 && quickReplySmsMessage != null) {
+//				Intent i = new Intent(
+//						SmsPopupActivity.this.getApplicationContext(),
+//						SmsPopupUtilsService.class);
+//				i.setAction(SmsPopupUtilsService.ACTION_QUICKREPLY);
+//				i.putExtras(quickReplySmsMessage.toBundle());
+//				i.putExtra(SmsMmsMessage.EXTRAS_QUICKREPLY, quickReplyMessage);
+//				if (BuildConfig.DEBUG)
+//					Log.v("Sending message to "
+//							+ quickReplySmsMessage.getContactName());
+//				WakefulBroadcastReceiver.startWakefulService(
+//						getApplicationContext(), i);
+//				Toast.makeText(this, R.string.quickreply_sending_toast,
+//						Toast.LENGTH_LONG).show();
+//				dismissDialog(DIALOG_QUICKREPLY);
+//				removeActiveMessage();
+//			} else {
+//				Toast.makeText(this, R.string.quickreply_nomessage_toast,
+//						Toast.LENGTH_LONG).show();
+//			}
+//		}
+//	}
 
 	/**
 	 * Show the quick reply dialog, resetting the text in the edittext and
@@ -1260,34 +1261,34 @@ public class SmsPopupActivity extends FragmentActivity implements
 	 * ****************
 	 */
 
-	/**
-	 * Show the soft keyboard and store the view that triggered it
-	 */
-	private void showSoftKeyboard(View triggerView) {
-		if (BuildConfig.DEBUG)
-			Log.v("showSoftKeyboard()");
-		if (inputManager == null) {
-			inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		}
-		inputView = triggerView;
-		inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-	}
-
-	/**
-	 * Hide the soft keyboard
-	 */
-	private void hideSoftKeyboard() {
-		if (inputView == null)
-			return;
-		if (BuildConfig.DEBUG)
-			Log.v("hideSoftKeyboard()");
-		if (inputManager == null) {
-			inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		}
-		inputManager.hideSoftInputFromWindow(
-				inputView.getApplicationWindowToken(), 0);
-		inputView = null;
-	}
+//	/**
+//	 * Show the soft keyboard and store the view that triggered it
+//	 */
+//	private void showSoftKeyboard(View triggerView) {
+//		if (BuildConfig.DEBUG)
+//			Log.v("showSoftKeyboard()");
+//		if (inputManager == null) {
+//			inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//		}
+//		inputView = triggerView;
+//		inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+//	}
+//
+//	/**
+//	 * Hide the soft keyboard
+//	 */
+//	private void hideSoftKeyboard() {
+//		if (inputView == null)
+//			return;
+//		if (BuildConfig.DEBUG)
+//			Log.v("hideSoftKeyboard()");
+//		if (inputManager == null) {
+//			inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//		}
+//		inputManager.hideSoftInputFromWindow(
+//				inputView.getApplicationWindowToken(), 0);
+//		inputView = null;
+//	}
 
 	private class SmsPopupPagerAdapter extends FragmentStatePagerAdapter {
 
@@ -1374,10 +1375,10 @@ public class SmsPopupActivity extends FragmentActivity implements
 					.show();
 			// replyToMessage(true);
 			break;
-		case ButtonListPreference.BUTTON_QUICKREPLY: // Quick Reply
-			// quickReply();
-			sendQuickReply("");
-			break;
+//		case ButtonListPreference.BUTTON_QUICKREPLY: // Quick Reply
+//			// quickReply();
+//			sendQuickReply("");
+//			break;
 		case ButtonListPreference.BUTTON_REPLY_BY_ADDRESS: // Quick Reply
 			replyToMessage(false);
 			break;
