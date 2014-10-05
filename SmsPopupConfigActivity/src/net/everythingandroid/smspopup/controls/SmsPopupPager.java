@@ -254,15 +254,15 @@ public class SmsPopupPager extends ViewPager implements OnPageChangeListener {
         return messages.get(i);
     }
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent event) {
-        mGestureDetector.onTouchEvent(event);
-        return super.onInterceptTouchEvent(event);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mGestureDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
+//    @Override
+//    public boolean onInterceptTouchEvent(MotionEvent event) {
+//        mGestureDetector.onTouchEvent(event);
+//        return super.onInterceptTouchEvent(event);
+//    }
+//
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        mGestureDetector.onTouchEvent(event);
+//        return super.onTouchEvent(event);
+//    }
 }

@@ -65,7 +65,7 @@ public class SmsPopupFragment extends Fragment {
 
 	private TextView fromTv;
 	private TextView timestampTv;
-	private TextView messageTv;
+	private static TextView messageTv;
 	// private LinearLayout mainLayout;
 	// private ScrollView contentMessage;
 	// private LinearLayout contentMms;
@@ -104,6 +104,8 @@ public class SmsPopupFragment extends Fragment {
 	private static final int BUTTON_SWITCHER_MAIN_BUTTONS = 0;
 	private static final int BUTTON_SWITCHER_UNLOCK_BUTTON = 1;
 	private static final String EMPTY_MMS_SUBJECT = "no subject";
+	
+	private static SmsPopupFragment frag;
 
 	public static SmsPopupFragment newInstance(SmsMmsMessage newMessage,
 			int[] buttons, int privacyMode, boolean showUnlockButton,
@@ -123,6 +125,16 @@ public class SmsPopupFragment extends Fragment {
 			int[] buttons) {
 		return newInstance(newMessage, buttons, PRIVACY_MODE_OFF, false, true);
 	}
+	
+	public static SmsPopupFragment getInstance() {
+		
+		if(null == frag){
+			frag = new SmsPopupFragment();
+        }
+
+        return frag;
+		
+	}
 
 	public SmsPopupFragment() {
 	};
@@ -130,10 +142,14 @@ public class SmsPopupFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
+		
+		
 		final Bundle args = getArguments();
 		message = new SmsMmsMessage(getActivity(), args);
 
+		android.util.Log.i("onCreateView message: ", message.getAddress());
+
+		
 		View v = inflater.inflate(R.layout.custom_sms_dialog, container, false);
 
 		quickreplyTextView = (TextView) v.findViewById(R.id.QuickReplyTextView);
@@ -184,12 +200,13 @@ public class SmsPopupFragment extends Fragment {
 		});
 
 		final ImageView imgEnter = (ImageView) v.findViewById(R.id.imgEnter);
+		imgEnter.setEnabled(false);
 		qrEditText.addTextChangedListener(new TextWatcher() {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
-				if (qrEditText.getText().toString().length() > 0) {
+				if (qrEditText.getText().toString().trim().length() > 0) {
 					imgEnter.setImageResource(R.drawable.ic_enter);
 					imgEnter.setEnabled(true);
 				} else {
@@ -595,39 +612,14 @@ public class SmsPopupFragment extends Fragment {
 	// }
 	// }
 	
-	/**
-	 * Show the soft keyboard and store the view that triggered it
-	 */
-	private void showSoftKeyboard(View triggerView) {
-		if (BuildConfig.DEBUG)
-			Log.v("showSoftKeyboard()");
-		if (inputManager == null) {
-			inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-		}
-		inputView = triggerView;
-		inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-	}
-
-	/**
-	 * Hide the soft keyboard
-	 */
-	private void hideSoftKeyboard() {
-		if (inputView == null)
-			return;
-		if (BuildConfig.DEBUG)
-			Log.v("hideSoftKeyboard()");
-		if (inputManager == null) {
-			inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-		}
-		inputManager.hideSoftInputFromWindow(
-				inputView.getApplicationWindowToken(), 0);
-		inputView = null;
-	}
-
 	public static interface SmsPopupButtonsListener {
 		abstract void onButtonClicked(int buttonType);
 
 		// abstract LruCache<Uri, Bitmap> getCache();
+	}
+	
+	public void updateText(String text){
+		messageTv.append(text);
 	}
 
 }

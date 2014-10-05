@@ -81,16 +81,19 @@
         <EditText
             android:id="@+id/QuickReplyEditText"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_margin="5dp"
             android:layout_toLeftOf="@+id/imgEnter"
             android:layout_toRightOf="@+id/imgEmotion"
             android:background="@drawable/bg_info"
             android:hint="Type message"
             android:inputType="textMultiLine"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:textCursorDrawable="@null" >
+
+            <requestFocus />
+        </EditText>
 
         <ImageButton
             android:id="@+id/imgEnter"
@@ -117,6 +120,6 @@
         android:text="Text here"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/black"
-        android:textColorLink="?android:attr/textColorPrimaryDisableOnly" />
+        android:textColorLink="#33b5e5" />
 
 </RelativeLayout>

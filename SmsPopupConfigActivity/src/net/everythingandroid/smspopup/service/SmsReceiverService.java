@@ -266,10 +266,6 @@ public class SmsReceiverService extends IntentService {
         }
     }
 
-    private void showToast(String message) {
-        mToastHandler.sendMessage(
-                Message.obtain(mToastHandler, TOAST_HANDLER_MESSAGE_CUSTOM, message));
-    }
 
     /*
      * Handler to deal with showing Toast messages for message sent status
