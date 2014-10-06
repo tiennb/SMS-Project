@@ -62,7 +62,7 @@
                 android:textColor="#ffffffff"
                 android:textSize="11sp"
                 android:textStyle="bold"
-                android:visibility="gone" />
+                />
         </RelativeLayout>
 
         <Button

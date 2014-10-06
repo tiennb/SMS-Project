@@ -65,7 +65,7 @@ public class ReminderService extends IntentService {
                 ReminderService.scheduleReminder(context, message);
                 if (myPrefs.getBoolean(context.getString(R.string.pref_notif_repeat_screen_on_key),
                         Defaults.PREFS_NOTIF_REPEAT_SCREEN_ON)) {
-                    ManageWakeLock.acquireFull(context);
+                   // ManageWakeLock.acquireFull(context);
                 }
 
             }

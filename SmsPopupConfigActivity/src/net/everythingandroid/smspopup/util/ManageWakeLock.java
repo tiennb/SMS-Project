@@ -40,21 +40,21 @@ public class ManageWakeLock {
         if (mPrefs.getBoolean(mContext.getString(R.string.pref_screen_on_key),
                 PREFS_SCREENON_DEFAULT)) {
             flags |= PowerManager.ACQUIRE_CAUSES_WAKEUP;
-            ManageKeyguard.disableKeyguard(mContext);
+           // ManageKeyguard.disableKeyguard(mContext);
         }
 
         mWakeLock = mPm.newWakeLock(flags, Log.LOGTAG + ".full");
         mWakeLock.setReferenceCounted(false);
         mWakeLock.acquire();
-        if (BuildConfig.DEBUG)
-            Log.v("**Wakelock acquired");
-
-        // Fetch wakelock/screen timeout from preferences
-        int timeout = Integer.valueOf(mPrefs.getString(
-                mContext.getString(R.string.pref_timeout_key), PREFS_TIMEOUT_DEFAULT));
-
-        // Set a receiver to remove all locks in "timeout" seconds
-        ClearAllReceiver.setCancel(mContext, timeout);
+//        if (BuildConfig.DEBUG)
+//            Log.v("**Wakelock acquired");
+//
+//        // Fetch wakelock/screen timeout from preferences
+//        int timeout = Integer.valueOf(mPrefs.getString(
+//                mContext.getString(R.string.pref_timeout_key), PREFS_TIMEOUT_DEFAULT));
+//
+//        // Set a receiver to remove all locks in "timeout" seconds
+//        ClearAllReceiver.setCancel(mContext, timeout);
     }
 
     public static synchronized void acquirePartial(Context mContext) {

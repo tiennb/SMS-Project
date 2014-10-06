@@ -46,7 +46,7 @@ public class ManageNotification {
     private static final int NOTIFY = 0;
     private static final int FAILED = 1;
     public static final int[][] NOTIF_ICON_RES = {
-            { R.drawable.stat_notify_sms, R.drawable.stat_notify_sms_failed },
+            { R.drawable.ic_sms_notify, R.drawable.stat_notify_sms_failed },
             { R.drawable.stat_notify_sms_old, R.drawable.stat_notify_sms_failed },
             { R.drawable.stat_notify_sms_htc, R.drawable.stat_notify_sms_failed_htc },
             { R.drawable.stat_notify_sms_blur, R.drawable.stat_notify_sms_failed },
@@ -100,6 +100,7 @@ public class ManageNotification {
      * Class to hold the popup notification elements
      */
     static class PopupNotification {
+    	
         public NotificationCompat.Builder notificationBuilder;
         public boolean privacyMode;
         public boolean privacySender;
@@ -362,14 +363,14 @@ public class ManageNotification {
         boolean privacyAlways =
                 mPrefs.getBoolean(R.string.pref_privacy_always_key, Defaults.PREFS_PRIVACY_ALWAYS);
 
-        // Fetch notification icon
-        int notifIcon =
-                Integer.valueOf(mPrefs.getString(R.string.pref_notif_icon_key,
-                        Defaults.PREFS_NOTIF_ICON));
-        if (notifIcon < 0 || notifIcon >= NOTIF_ICON_RES.length) {
-            notifIcon = Integer.valueOf(Defaults.PREFS_NOTIF_ICON);
-            mPrefs.putString(R.string.pref_notif_icon_key, String.valueOf(notifIcon));
-        }
+//        // Fetch notification icon
+//        int notifIcon =
+//                Integer.valueOf(mPrefs.getString(R.string.pref_notif_icon_key,
+//                        Defaults.PREFS_NOTIF_ICON));
+//        if (notifIcon < 0 || notifIcon >= NOTIF_ICON_RES.length) {
+//            notifIcon = Integer.valueOf(Defaults.PREFS_NOTIF_ICON);
+//            mPrefs.putString(R.string.pref_notif_icon_key, String.valueOf(notifIcon));
+//        }
 
         boolean replyToThread =
                 mPrefs.getBoolean(R.string.pref_reply_to_thread_key, Defaults.PREFS_REPLY_TO_THREAD);
@@ -495,8 +496,8 @@ public class ManageNotification {
         popupNotification.privacyMode = privacyMode;
         popupNotification.privacySender = privacySender;
         popupNotification.privacyAlways = privacyAlways;
-        popupNotification.notifIcon = NOTIF_ICON_RES[notifIcon][NOTIFY];
-        popupNotification.notifFailedIcon = NOTIF_ICON_RES[notifIcon][FAILED];
+        popupNotification.notifIcon = NOTIF_ICON_RES[0][NOTIFY];
+        popupNotification.notifFailedIcon = NOTIF_ICON_RES[0][FAILED];
 
         return popupNotification;
     }

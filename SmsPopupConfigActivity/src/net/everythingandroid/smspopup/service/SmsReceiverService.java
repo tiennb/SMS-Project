@@ -157,12 +157,12 @@ public class SmsReceiverService extends IntentService {
         boolean onlyShowOnKeyguard =
                 mPrefs.getBoolean(R.string.pref_onlyShowOnKeyguard_key,
                         Defaults.PREFS_ONLY_SHOW_ON_KEYGUARD);
-
-        // check if popup is enabled for this contact
-        boolean showPopup =
-                mPrefs.getBoolean(R.string.pref_popup_enabled_key,
-                        Defaults.PREFS_SHOW_POPUP,
-                        ContactNotifications.POPUP_ENABLED);
+//
+//        // check if popup is enabled for this contact
+//        boolean showPopup =
+//                mPrefs.getBoolean(R.string.pref_popup_enabled_key,
+//                        Defaults.PREFS_SHOW_POPUP,
+//                        ContactNotifications.POPUP_ENABLED);
 
         // check if notifications are on for this contact
         boolean notifEnabled =
@@ -191,23 +191,25 @@ public class SmsReceiverService extends IntentService {
          * user is not in messaging app: then show the popup activity, otherwise check if
          * notifications are on and just use the standard notification))
          */
-        if (showPopup && callStateIdle && !docked
+        if (callStateIdle && !docked
                 && (ManageKeyguard.inKeyguardRestrictedInputMode() ||
                 (!onlyShowOnKeyguard && !SmsPopupUtils.inMessagingApp(context)))) {
 
             if (BuildConfig.DEBUG)
                 Log.v("Showing SMS Popup: " + message.getAddress());
-            ManageWakeLock.acquirePartial(context);
+            //ManageWakeLock.acquirePartial(context);
             context.startActivity(message.getPopupIntent());
 
-        } else if (notifEnabled) {
-
-            if (BuildConfig.DEBUG)
-                Log.v("^^^^^^Not showing SMS Popup, using notifications");
-            ManageNotification.show(context, message, message == null ? 0 : message.getUnreadCount());
-            ReminderService.scheduleReminder(context, message);
-
-        }
+        } 
+        
+////        else if (notifEnabled) {
+////
+////            if (BuildConfig.DEBUG)
+////                Log.v("^^^^^^Not showing SMS Popup, using notifications");
+////            ManageNotification.show(context, message, message == null ? 0 : message.getUnreadCount());
+////            ReminderService.scheduleReminder(context, message);
+//
+//        }
     }
 
     /**

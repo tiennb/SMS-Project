@@ -65,7 +65,7 @@
                     android:id="@+id/timestampTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="2dp"
+                    android:paddingBottom="6dp"
                     android:text="Timestamp here"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="?android:attr/textColorPrimaryDisableOnly"
@@ -105,16 +105,6 @@
                     android:textColor="?android:attr/textColorPrimaryDisableOnly"
                     android:textColorLink="?android:attr/textColorPrimaryDisableOnly"
                     tools:ignore="HardcodedText" />
-
-                <EditText
-                    android:id="@+id/QuickReplyEditText"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:imeOptions="actionSend|flagNoEnterAction"
-                    android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
-                    android:maxLength="1000"
-                    android:maxLines="3"
-                    android:nextFocusRight="@+id/send_button" />
             </LinearLayout>
         </ScrollView>
 

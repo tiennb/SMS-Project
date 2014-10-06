@@ -27,6 +27,7 @@
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/imgCancel"
             android:contentDescription="@null"
+            android:onClick="onClickekCall"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:src="@drawable/ic_call" />
@@ -57,6 +58,19 @@
             android:layout_alignLeft="@+id/QuickReplyTextView"
             android:layout_below="@+id/QuickReplyTextView"
             android:text="Sdt" />
+
+        <TextView
+            android:id="@+id/timestampTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:paddingBottom="12dp"
+            android:text="Timestamp here"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?android:attr/textColorPrimaryDisableOnly"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -78,12 +92,14 @@
             android:contentDescription="@null"
             android:src="@drawable/ic_emotion" />
 
+
         <EditText
             android:id="@+id/QuickReplyEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
+            android:layout_below="@+id/QuickReplyCounterTextView"
             android:layout_toLeftOf="@+id/imgEnter"
             android:layout_toRightOf="@+id/imgEmotion"
             android:background="@drawable/bg_info"
@@ -105,6 +121,19 @@
             android:background="@android:color/transparent"
             android:contentDescription="@null"
             android:src="@drawable/ic_enter" />
+
+        <TextView
+            android:id="@+id/QuickReplyCounterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/QuickReplyEditText"
+            android:layout_alignParentTop="true"
+            android:paddingTop="4dp"
+            android:text="0/160"
+            android:textColor="#88000000"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
     </RelativeLayout>
 
     <TextView

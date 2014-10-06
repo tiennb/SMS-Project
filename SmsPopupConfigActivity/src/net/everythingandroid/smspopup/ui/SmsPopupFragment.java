@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import net.everythingandroid.smspopup.BuildConfig;
 import net.everythingandroid.smspopup.R;
+import net.everythingandroid.smspopup.controls.QmTextWatcher;
 import net.everythingandroid.smspopup.preferences.ButtonListPreference;
 import net.everythingandroid.smspopup.provider.GridEmotionAdapter;
 import net.everythingandroid.smspopup.provider.IConstant;
@@ -54,23 +55,24 @@ import android.widget.Toast;
 public class SmsPopupFragment extends Fragment {
 	private SmsMmsMessage message;
 	private boolean messageViewed = false;
-	
+
 	private InputMethodManager inputManager;
 	private View inputView;
-	
+
 	private SmsPopupButtonsListener mButtonsListener;
 	//
 	private TextView quickreplyTextView;
 	private EditText qrEditText;
 
 	private TextView fromTv;
+	private ImageView imgCall;
 	private TextView timestampTv;
 	private static TextView messageTv;
 	// private LinearLayout mainLayout;
 	// private ScrollView contentMessage;
 	// private LinearLayout contentMms;
 	// private LinearLayout contentPrivacy;
-	//private int contentNum = 0;
+	// private int contentNum = 0;
 
 	// private int privacyMode = PRIVACY_MODE_OFF;
 	// private boolean showUnlockButton = false;
@@ -104,7 +106,7 @@ public class SmsPopupFragment extends Fragment {
 	private static final int BUTTON_SWITCHER_MAIN_BUTTONS = 0;
 	private static final int BUTTON_SWITCHER_UNLOCK_BUTTON = 1;
 	private static final String EMPTY_MMS_SUBJECT = "no subject";
-	
+
 	private static SmsPopupFragment frag;
 
 	public static SmsPopupFragment newInstance(SmsMmsMessage newMessage,
@@ -125,15 +127,15 @@ public class SmsPopupFragment extends Fragment {
 			int[] buttons) {
 		return newInstance(newMessage, buttons, PRIVACY_MODE_OFF, false, true);
 	}
-	
-	public static SmsPopupFragment getInstance() {
-		
-		if(null == frag){
-			frag = new SmsPopupFragment();
-        }
 
-        return frag;
-		
+	public static SmsPopupFragment getInstance() {
+
+		if (null == frag) {
+			frag = new SmsPopupFragment();
+		}
+
+		return frag;
+
 	}
 
 	public SmsPopupFragment() {
@@ -142,14 +144,12 @@ public class SmsPopupFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
-		
+
 		final Bundle args = getArguments();
 		message = new SmsMmsMessage(getActivity(), args);
 
 		android.util.Log.i("onCreateView message: ", message.getAddress());
 
-		
 		View v = inflater.inflate(R.layout.custom_sms_dialog, container, false);
 
 		quickreplyTextView = (TextView) v.findViewById(R.id.QuickReplyTextView);
@@ -160,7 +160,11 @@ public class SmsPopupFragment extends Fragment {
 		imgEmotion = (ImageView) v.findViewById(R.id.imgEmotion);
 		fromTv = (TextView) v.findViewById(R.id.fromTextView);
 		messageTv = (TextView) v.findViewById(R.id.messageTextView);
-		// timestampTv = (TextView) v.findViewById(R.id.timestampTextView);
+		timestampTv = (TextView) v.findViewById(R.id.timestampTextView);
+		imgCall = (ImageView) v.findViewById(R.id.imgCall);
+		final TextView qrCounterTextView = (TextView) v
+				.findViewById(R.id.QuickReplyCounterTextView);
+
 		// contentMessage = (ScrollView) v.findViewById(R.id.contentMessage);
 		// contentMms = (LinearLayout) v.findViewById(R.id.contentMms);
 
@@ -173,15 +177,27 @@ public class SmsPopupFragment extends Fragment {
 		// android.util.Log.i("buttonText: ", buttons[0]+ " " +
 		// buttonText[buttons[0]]);
 
+		imgCall.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				String number = "tel:" + fromTv.getText().toString().trim();
+				Intent callIntent = new Intent(Intent.ACTION_CALL, Uri
+						.parse(number));
+				getActivity().startActivity(callIntent);
+
+			}
+		});
+
 		imgEmotion.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				onClickEmotion(imgEmotion);
-				
+
 			}
 		});
-		
+
 		// if (showButtons) {
 		final ImageView button1 = (ImageView) v.findViewById(R.id.imgCancel);
 		// final PopupButton button1Vals = new PopupButton(buttons[0],
@@ -201,32 +217,9 @@ public class SmsPopupFragment extends Fragment {
 
 		final ImageView imgEnter = (ImageView) v.findViewById(R.id.imgEnter);
 		imgEnter.setEnabled(false);
-		qrEditText.addTextChangedListener(new TextWatcher() {
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-				if (qrEditText.getText().toString().trim().length() > 0) {
-					imgEnter.setImageResource(R.drawable.ic_enter);
-					imgEnter.setEnabled(true);
-				} else {
-					imgEnter.setImageResource(R.drawable.ic_enter_disable);
-					imgEnter.setEnabled(false);
-				}
-
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-
-			}
-		});
+		
+		qrEditText.addTextChangedListener(new QmTextWatcher(getActivity(),
+				qrCounterTextView, imgEnter));
 
 		imgEnter.setOnClickListener(new OnClickListener() {
 			@Override
@@ -290,7 +283,7 @@ public class SmsPopupFragment extends Fragment {
 		}
 
 		// loadContactPhoto();
-		// timestampTv.setText(message.getFormattedTimestamp());
+		timestampTv.setText(message.getFormattedTimestamp());
 
 		// setPrivacy(privacyMode, true);
 		// refreshButtonViews();
@@ -345,10 +338,11 @@ public class SmsPopupFragment extends Fragment {
 			}
 		}
 	}
-	
+
 	public void onClickEmotion(View v) {
-		LayoutInflater layoutInflater = (LayoutInflater) getActivity().getBaseContext()
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater layoutInflater = (LayoutInflater) getActivity()
+				.getBaseContext().getSystemService(
+						Context.LAYOUT_INFLATER_SERVICE);
 
 		View popupView = layoutInflater.inflate(R.layout.popup_emotion, null);
 		final PopupWindow popupWindow = new PopupWindow(popupView,
@@ -363,7 +357,8 @@ public class SmsPopupFragment extends Fragment {
 			emoList.add(IConstant.emotions[i]);
 		}
 
-		gridEmotion.setAdapter(new GridEmotionAdapter(getActivity().getApplicationContext(), emoList));
+		gridEmotion.setAdapter(new GridEmotionAdapter(getActivity()
+				.getApplicationContext(), emoList));
 
 		// Closes the popup window when touch outside of it - when looses focus
 		popupWindow.setOutsideTouchable(true);
@@ -382,14 +377,15 @@ public class SmsPopupFragment extends Fragment {
 				qrEditText.setSelection(qrEditText.getText().length());
 
 				popupWindow.dismiss();
-				getActivity().getWindow()
+				getActivity()
+						.getWindow()
 						.setSoftInputMode(
 								WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 			}
 		});
 
 		popupWindow.showAsDropDown(v, 0, -600);
-		
+
 	}
 
 	// public void resizeLayout(int newWidth, int screenWidth) {
@@ -611,14 +607,14 @@ public class SmsPopupFragment extends Fragment {
 	// mButtonsListener.onButtonClicked(buttonId);
 	// }
 	// }
-	
+
 	public static interface SmsPopupButtonsListener {
 		abstract void onButtonClicked(int buttonType);
 
 		// abstract LruCache<Uri, Bitmap> getCache();
 	}
-	
-	public void updateText(String text){
+
+	public void updateText(String text) {
 		messageTv.append(text);
 	}
 

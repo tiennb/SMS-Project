@@ -94,8 +94,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 	private InputMethodManager inputManager;
 	private View inputView;
 
-	ArrayList<SmsMmsMessage> listSms;
-
 	// private EditText qrEditText;
 	private ProgressDialog mProgressDialog;
 
@@ -223,8 +221,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 		smsPopupPager = (SmsPopupPager) findViewById(R.id.SmsPopupPager);
 		pagerIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
 
-		listSms = new ArrayList<SmsMmsMessage>();
-
 		smsPopupPagerAdapter = new SmsPopupPagerAdapter(
 				getSupportFragmentManager());
 
@@ -264,20 +260,17 @@ public class SmsPopupActivity extends FragmentActivity implements
 				} else if (total >= 2) {
 					pagerIndicator.setVisibility(View.VISIBLE);
 				}
-
-				if (hasNotified) {
-					ManageNotification.update(SmsPopupActivity.this,
-							smsPopupPager.getMessage(current), total);
-				}
+//
+//				if (hasNotified) {
+//					ManageNotification.update(SmsPopupActivity.this,
+//							smsPopupPager.getMessage(current), total);
+//				}
 			}
 		});
 
 		refreshViews();
 		resizeLayout();
 
-		// Log.v("Check Add Phone: " String.valueOf(listSms.size())+"");
-
-		android.util.Log.i("Check Add phone: ", listSms.size() + "");
 	}
 
 	private void initializeMessagesAndWake(Bundle b) {
@@ -442,28 +435,30 @@ public class SmsPopupActivity extends FragmentActivity implements
 	 * is done for this activity (end of onCreate()).
 	 */
 	private void wakeApp() {
-
+		//Turn on screen
 		// Time to acquire a full WakeLock (turn on screen)
 		ManageWakeLock.acquireFull(getApplicationContext());
 		ManageWakeLock.releasePartial();
 
+		
+		
 		replying = false;
 		inbox = false;
-
-		SmsMmsMessage notifyMessage = smsPopupPager.shouldNotify();
-
-		// See if a notification is needed for this set of messages
-		if (notifyMessage != null) {
-
-			// Schedule a reminder notification
-			ReminderService.scheduleReminder(this, notifyMessage);
-
-			// Run the notification
-			ManageNotification.show(this, notifyMessage,
-					smsPopupPager.getPageCount());
-
-			hasNotified = true;
-		}
+//
+//		SmsMmsMessage notifyMessage = smsPopupPager.shouldNotify();
+//
+//		// See if a notification is needed for this set of messages
+//		if (notifyMessage != null) {
+//
+//			// Schedule a reminder notification
+//			ReminderService.scheduleReminder(this, notifyMessage);
+//
+//			// Run the notification
+//			ManageNotification.show(this, notifyMessage,
+//					smsPopupPager.getPageCount());
+//
+//			hasNotified = true;
+//		}
 	}
 
 	/**
@@ -679,43 +674,43 @@ public class SmsPopupActivity extends FragmentActivity implements
 		// }
 		// });
 		//
-		// qrEditText.addTextChangedListener(new QmTextWatcher(this,
-		// qrCounterTextView, qrSendButton));
-		// qrEditText.setOnEditorActionListener(new OnEditorActionListener() {
-		// @Override
-		// public boolean onEditorAction(TextView v, int actionId,
-		// KeyEvent event) {
-		//
-		// // event != null means enter key pressed
-		// if (event != null) {
-		// // if shift is not pressed then move focus to send
-		// // button
-		// if (!event.isShiftPressed()) {
-		// if (v != null) {
-		// View focusableView = v
-		// .focusSearch(View.FOCUS_RIGHT);
-		// if (focusableView != null) {
-		// focusableView.requestFocus();
-		// return true;
-		// }
-		// }
-		// }
-		//
-		// // otherwise allow keypress through
-		// return false;
-		// }
-		//
-		// if (actionId == EditorInfo.IME_ACTION_SEND) {
-		// if (v != null) {
-		// sendQuickReply(v.getText().toString());
-		// }
-		// return true;
-		// }
-		//
-		// // else consume
-		// return true;
-		// }
-		// });
+//		 qrEditText.addTextChangedListener(new QmTextWatcher(this,
+//		 qrCounterTextView, qrSendButton));
+//		 qrEditText.setOnEditorActionListener(new OnEditorActionListener() {
+//		 @Override
+//		 public boolean onEditorAction(TextView v, int actionId,
+//		 KeyEvent event) {
+//		
+//		 // event != null means enter key pressed
+//		 if (event != null) {
+//		 // if shift is not pressed then move focus to send
+//		 // button
+//		 if (!event.isShiftPressed()) {
+//		 if (v != null) {
+//		 View focusableView = v
+//		 .focusSearch(View.FOCUS_RIGHT);
+//		 if (focusableView != null) {
+//		 focusableView.requestFocus();
+//		 return true;
+//		 }
+//		 }
+//		 }
+//		
+//		 // otherwise allow keypress through
+//		 return false;
+//		 }
+//		
+//		 if (actionId == EditorInfo.IME_ACTION_SEND) {
+//		 if (v != null) {
+//		 sendQuickReply(v.getText().toString());
+//		 }
+//		 return true;
+//		 }
+//		
+//		 // else consume
+//		 return true;
+//		 }
+//		 });
 		//
 		// quickreplyTextView = (TextView) qrLayout
 		// .findViewById(R.id.QuickReplyTextView);
