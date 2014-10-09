@@ -61,6 +61,7 @@ import com.viewpagerindicator.CirclePageIndicator;
 
 import net.everythingandroid.smspopup.BuildConfig;
 import net.everythingandroid.smspopup.R;
+import net.everythingandroid.smspopup.constant.IConstant;
 import net.everythingandroid.smspopup.controls.FragmentStatePagerAdapter;
 import net.everythingandroid.smspopup.controls.QmTextWatcher;
 import net.everythingandroid.smspopup.controls.SmsPopupPager;
@@ -155,7 +156,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 		setupViews();
 
 		if (bundle == null) { // new activity
-			
+
 			Log.v("SMS is incomming!!!!!");
 			initializeMessagesAndWake(getIntent().getExtras());
 		} else { // this activity was recreated after being destroyed
@@ -229,27 +230,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 		pagerIndicator.setViewPager(smsPopupPager);
 		smsPopupPager.setIndicator(pagerIndicator);
 
-		// smsPopupPager.setGestureListener(new SimpleOnGestureListener() {
-		// @Override
-		// public void onLongPress(MotionEvent e) {
-		// smsPopupPager.showContextMenu();
-		// }
-		// });
-
-		// registerForContextMenu(smsPopupPager);
-
-//		RetainFragment mRetainFragment = RetainFragment
-//				.findOrCreateRetainFragment(getSupportFragmentManager());
-//
-//		mBitmapCache = (LruCache<Uri, Bitmap>) mRetainFragment.getObject();
-//
-//		// Init cache
-//		if (mBitmapCache == null) {
-//			mBitmapCache = new LruCache<Uri, Bitmap>(BITMAP_CACHE_SIZE);
-//			mRetainFragment.setObject(mBitmapCache);
-//		}
-		
-
 		smsPopupPager.setOnMessageCountChanged(new MessageCountChanged() {
 
 			@Override
@@ -260,11 +240,11 @@ public class SmsPopupActivity extends FragmentActivity implements
 				} else if (total >= 2) {
 					pagerIndicator.setVisibility(View.VISIBLE);
 				}
-//
-//				if (hasNotified) {
-//					ManageNotification.update(SmsPopupActivity.this,
-//							smsPopupPager.getMessage(current), total);
-//				}
+				//
+				// if (hasNotified) {
+				// ManageNotification.update(SmsPopupActivity.this,
+				// smsPopupPager.getMessage(current), total);
+				// }
 			}
 		});
 
@@ -435,30 +415,28 @@ public class SmsPopupActivity extends FragmentActivity implements
 	 * is done for this activity (end of onCreate()).
 	 */
 	private void wakeApp() {
-		//Turn on screen
+		// Turn on screen
 		// Time to acquire a full WakeLock (turn on screen)
 		ManageWakeLock.acquireFull(getApplicationContext());
 		ManageWakeLock.releasePartial();
 
-		
-		
 		replying = false;
 		inbox = false;
-//
-//		SmsMmsMessage notifyMessage = smsPopupPager.shouldNotify();
-//
-//		// See if a notification is needed for this set of messages
-//		if (notifyMessage != null) {
-//
-//			// Schedule a reminder notification
-//			ReminderService.scheduleReminder(this, notifyMessage);
-//
-//			// Run the notification
-//			ManageNotification.show(this, notifyMessage,
-//					smsPopupPager.getPageCount());
-//
-//			hasNotified = true;
-//		}
+		//
+		// SmsMmsMessage notifyMessage = smsPopupPager.shouldNotify();
+		//
+		// // See if a notification is needed for this set of messages
+		// if (notifyMessage != null) {
+		//
+		// // Schedule a reminder notification
+		// ReminderService.scheduleReminder(this, notifyMessage);
+		//
+		// // Run the notification
+		// ManageNotification.show(this, notifyMessage,
+		// smsPopupPager.getPageCount());
+		//
+		// hasNotified = true;
+		// }
 	}
 
 	/**
@@ -598,237 +576,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 			Log.v("onCreateDialog()");
 
 		switch (id) {
-
-		// /*
-		// * Delete message dialog
-		// */
-		// case DIALOG_DELETE:
-		// return new AlertDialog.Builder(this)
-		// .setIcon(android.R.drawable.ic_dialog_alert)
-		// .setTitle(
-		// getString(R.string.pref_show_delete_button_dialog_title))
-		// .setMessage(
-		// getString(R.string.pref_show_delete_button_dialog_text))
-		// .setPositiveButton(android.R.string.ok,
-		// new DialogInterface.OnClickListener() {
-		// @Override
-		// public void onClick(DialogInterface dialog,
-		// int whichButton) {
-		// deleteMessage();
-		// }
-		// }).setNegativeButton(android.R.string.cancel, null)
-		// .create();
-
-		/*
-		 * Quick Reply Dialog
-		 */
-		// case DIALOG_QUICKREPLY:
-		// LayoutInflater factory = getLayoutInflater();
-		// final View qrLayout = factory.inflate(R.layout.message_quick_reply,
-		// null);
-		// qrEditText = (EditText) qrLayout
-		// .findViewById(R.id.QuickReplyEditText);
-		// final TextView qrCounterTextView = (TextView) qrLayout
-		// .findViewById(R.id.QuickReplyCounterTextView);
-		// final Button qrSendButton = (Button) qrLayout
-		// .findViewById(R.id.send_button);
-		//
-		// final ImageButton voiceRecognitionButton = (ImageButton) qrLayout
-		// .findViewById(R.id.SpeechRecogButton);
-		//
-		// voiceRecognitionButton.setOnClickListener(new OnClickListener() {
-		// @Override
-		// public void onClick(View view) {
-		// final Intent intent = new Intent(
-		// RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-		// intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-		// RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-		//
-		// // Check if the device has the ability to do speech
-		// // recognition
-		// final PackageManager packageManager = SmsPopupActivity.this
-		// .getPackageManager();
-		// List<ResolveInfo> list = packageManager
-		// .queryIntentActivities(intent, 0);
-		//
-		// if (list.size() > 0) {
-		// // TODO: really should allow voice input here without
-		// // unlocking first
-		// // (quick replies without unlock are OK anyway)
-		// exitingKeyguardSecurely = true;
-		// ManageKeyguard
-		// .exitKeyguardSecurely(new LaunchOnKeyguardExit() {
-		// @Override
-		// public void LaunchOnKeyguardExitSuccess() {
-		// SmsPopupActivity.this
-		// .startActivityForResult(intent,
-		// VOICE_RECOGNITION_REQUEST_CODE);
-		// }
-		// });
-		// } else {
-		// Toast.makeText(SmsPopupActivity.this,
-		// R.string.error_no_voice_recognition,
-		// Toast.LENGTH_LONG).show();
-		// view.setEnabled(false);
-		// }
-		// }
-		// });
-		//
-//		 qrEditText.addTextChangedListener(new QmTextWatcher(this,
-//		 qrCounterTextView, qrSendButton));
-//		 qrEditText.setOnEditorActionListener(new OnEditorActionListener() {
-//		 @Override
-//		 public boolean onEditorAction(TextView v, int actionId,
-//		 KeyEvent event) {
-//		
-//		 // event != null means enter key pressed
-//		 if (event != null) {
-//		 // if shift is not pressed then move focus to send
-//		 // button
-//		 if (!event.isShiftPressed()) {
-//		 if (v != null) {
-//		 View focusableView = v
-//		 .focusSearch(View.FOCUS_RIGHT);
-//		 if (focusableView != null) {
-//		 focusableView.requestFocus();
-//		 return true;
-//		 }
-//		 }
-//		 }
-//		
-//		 // otherwise allow keypress through
-//		 return false;
-//		 }
-//		
-//		 if (actionId == EditorInfo.IME_ACTION_SEND) {
-//		 if (v != null) {
-//		 sendQuickReply(v.getText().toString());
-//		 }
-//		 return true;
-//		 }
-//		
-//		 // else consume
-//		 return true;
-//		 }
-//		 });
-		//
-		// quickreplyTextView = (TextView) qrLayout
-		// .findViewById(R.id.QuickReplyTextView);
-		// QmTextWatcher.getQuickReplyCounterText(qrEditText.getText()
-		// .toString(), qrCounterTextView, qrSendButton);
-		//
-		// qrSendButton.setOnClickListener(new OnClickListener() {
-		// @Override
-		// public void onClick(View v) {
-		// sendQuickReply(qrEditText.getText().toString());
-		// }
-		// });
-		//
-		// // Construct basic AlertDialog using AlertDialog.Builder
-		// final AlertDialog qrAlertDialog = new AlertDialog.Builder(this)
-		// .setIcon(android.R.drawable.ic_dialog_email)
-		// .setTitle(R.string.quickreply_title).create();
-		//
-		// // Set the custom layout with no spacing at the bottom
-		// qrAlertDialog.setView(qrLayout, 0,
-		// SmsPopupUtils.pixelsToDip(getResources(), 5), 0, 0);
-		//
-		// qrAlertDialog.setOnCancelListener(new OnCancelListener() {
-		// @Override
-		// public void onCancel(DialogInterface dialog) {
-		// storeQuickReplyText(qrEditText.getText().toString());
-		// removeDialog(DIALOG_QUICKREPLY);
-		// }
-		// });
-		//
-		// // Preset messages button
-		// Button presetButton = (Button) qrLayout
-		// .findViewById(R.id.PresetMessagesButton);
-		// presetButton.setOnClickListener(new OnClickListener() {
-		// @Override
-		// public void onClick(View v) {
-		// showDialog(DIALOG_PRESET_MSG);
-		// }
-		// });
-		//
-		// // Cancel button
-		// Button cancelButton = (Button) qrLayout
-		// .findViewById(R.id.CancelButton);
-		// cancelButton.setOnClickListener(new OnClickListener() {
-		// @Override
-		// public void onClick(View v) {
-		// if (qrAlertDialog != null) {
-		// hideSoftKeyboard();
-		// qrAlertDialog.dismiss();
-		// removeDialog(DIALOG_QUICKREPLY);
-		// }
-		// }
-		// });
-		//
-		// // Ensure this dialog is counted as "editable" (so soft keyboard
-		// // will always show on top)
-		// qrAlertDialog.getWindow().clearFlags(
-		// WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-		//
-		// qrAlertDialog.setOnDismissListener(new OnDismissListener() {
-		// @Override
-		// public void onDismiss(DialogInterface dialog) {
-		// if (BuildConfig.DEBUG)
-		// Log.v("Quick Reply Dialog: onDissmiss()");
-		// storeQuickReplyText(qrEditText.getText().toString());
-		// }
-		// });
-		//
-		// // Update quick reply views now that they have been created
-		// if (quickReplySmsMessage != null) {
-		// updateQuickReplyView(quickReplySmsMessage.getReplyText());
-		// } else {
-		// updateQuickReplyView("");
-		// }
-		//
-		// return qrAlertDialog;
-
-		// /*
-		// * Preset messages dialog
-		// */
-		// case DIALOG_PRESET_MSG:
-		// mCursor = getContentResolver().query(QuickMessages.CONTENT_URI,
-		// null, null, null, null);
-		// startManagingCursor(mCursor);
-		//
-		// AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(this)
-		// .setIcon(android.R.drawable.ic_dialog_email).setTitle(
-		// R.string.pref_message_presets_title);
-		//
-		// // If user has some presets defined ...
-		// if (mCursor != null && mCursor.getCount() > 0) {
-		//
-		// mDialogBuilder.setCursor(mCursor,
-		// new DialogInterface.OnClickListener() {
-		// @Override
-		// public void onClick(DialogInterface dialog, int item) {
-		// if (BuildConfig.DEBUG)
-		// Log.v("Item clicked = " + item);
-		// mCursor.moveToPosition(item);
-		// quickReply(mCursor.getString(mCursor
-		// .getColumnIndexOrThrow(QuickMessages.QUICKMESSAGE)));
-		// }
-		// }, QuickMessages.QUICKMESSAGE);
-		// } else { // Otherwise display a placeholder as user has no presets
-		// MatrixCursor emptyCursor = new MatrixCursor(new String[] {
-		// QuickMessages._ID, QuickMessages.QUICKMESSAGE });
-		// emptyCursor.addRow(new String[] { "0",
-		// getString(R.string.message_presets_empty_text) });
-		// mDialogBuilder.setCursor(emptyCursor,
-		// new DialogInterface.OnClickListener() {
-		// @Override
-		// public void onClick(DialogInterface dialog, int item) {
-		// }
-		// }, QuickMessages.QUICKMESSAGE);
-		// }
-		//
-		// return mDialogBuilder.create();
-
 		/*
 		 * Loading Dialog
 		 */
@@ -843,43 +590,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 		return null;
 	}
 
-	@Override
-	protected void onPrepareDialog(int id, Dialog dialog) {
-		super.onPrepareDialog(id, dialog);
-
-		if (BuildConfig.DEBUG)
-			Log.v("onPrepareDialog()");
-
-		// User interacted so remove all locks and cancel reminders
-		ClearAllReceiver.removeCancel(getApplicationContext());
-		ClearAllReceiver.clearAll(false);
-		ReminderService.cancelReminder(getApplicationContext());
-
-		// switch (id) {
-		// case DIALOG_QUICKREPLY:
-		// // Update dialog width to same size as popup message, this is incase
-		// // the screen
-		// // orientation changes and the dialog is left filling the whole
-		// // width of the screen.
-		// final LayoutParams quickreplyLP = dialog.getWindow()
-		// .getAttributes();
-		// quickreplyLP.width = (int) getResources().getDimension(
-		// R.dimen.smspopup_pager_width);
-		// dialog.getWindow().setAttributes(quickreplyLP);
-		// // showSoftKeyboard(qrEditText);
-		// break;
-		// case DIALOG_PRESET_MSG:
-		// // Update dialog width to same size as popup message, this is incase
-		// // the screen
-		// // orientation changes and the dialog is left filling the whole
-		// // width of the screen.
-		// final LayoutParams presetLP = dialog.getWindow().getAttributes();
-		// presetLP.width = (int) getResources().getDimension(
-		// R.dimen.smspopup_pager_width);
-		// dialog.getWindow().setAttributes(presetLP);
-		// break;
-		// }
-	}
 
 	/**
 	 * Handle the results from the recognition activity.
@@ -895,7 +605,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 					.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 			if (BuildConfig.DEBUG)
 				Log.v("Voice recog text: " + matches.get(0));
-			quickReply(matches.get(0));
+			// quickReply(matches.get(0));
 		}
 	}
 
@@ -979,37 +689,37 @@ public class SmsPopupActivity extends FragmentActivity implements
 		case CONTEXT_REPLY_ID:
 			replyToMessage();
 			break;
-		case CONTEXT_QUICKREPLY_ID:
-			quickReply();
-			break;
+		// case CONTEXT_QUICKREPLY_ID:
+		// quickReply();
+		// break;
 		case CONTEXT_INBOX_ID:
 			gotoInbox();
 			break;
-		case CONTEXT_TTS_ID:
-			speakMessage();
-			break;
+//		case CONTEXT_TTS_ID:
+//			speakMessage();
+//			break;
 		case CONTEXT_VIEWCONTACT_ID:
 			viewContact();
 			break;
 		}
 		return super.onContextItemSelected(item);
 	}
-
-	// The Android text-to-speech library OnInitListener (via wrapper class)
-	private final OnInitListener androidTtsListener = new OnInitListener() {
-		@Override
-		public void onInit(int status) {
-			if (mProgressDialog != null) {
-				mProgressDialog.dismiss();
-			}
-			if (status == TextToSpeech.SUCCESS) {
-				speakMessage();
-			} else {
-				Toast.makeText(SmsPopupActivity.this, R.string.error_message,
-						Toast.LENGTH_SHORT);
-			}
-		}
-	};
+//
+//	// The Android text-to-speech library OnInitListener (via wrapper class)
+//	private final OnInitListener androidTtsListener = new OnInitListener() {
+//		@Override
+//		public void onInit(int status) {
+//			if (mProgressDialog != null) {
+//				mProgressDialog.dismiss();
+//			}
+//			if (status == TextToSpeech.SUCCESS) {
+//				speakMessage();
+//			} else {
+//				Toast.makeText(SmsPopupActivity.this, R.string.error_message,
+//						Toast.LENGTH_SHORT);
+//			}
+//		}
+//	};
 
 	/*
 	 * *****************************************************************************
@@ -1022,33 +732,33 @@ public class SmsPopupActivity extends FragmentActivity implements
 	 * Speak the message out loud using text-to-speech (either via Android
 	 * text-to-speech or via the free eyes-free text-to-speech library)
 	 */
-	private void speakMessage() {
-		// TODO: we should really require the keyguard be unlocked here if we
-		// are in privacy mode
-
-		// If not previously initialized...
-		if (androidTts == null) {
-
-			// Show a loading dialog
-			showDialog(DIALOG_LOADING);
-
-			// User interacted so remove all locks and cancel reminders
-			ClearAllReceiver.removeCancel(getApplicationContext());
-			ClearAllReceiver.clearAll(false);
-			ReminderService.cancelReminder(getApplicationContext());
-
-			// We'll use update notification to stop the sound playing
-			ManageNotification.update(this, smsPopupPager.getActiveMessage(),
-					smsPopupPager.getPageCount());
-
-			androidTts = new TextToSpeech(SmsPopupActivity.this,
-					androidTtsListener);
-
-		} else {
-			androidTts.speak(smsPopupPager.getActiveMessage().getMessageBody(),
-					TextToSpeech.QUEUE_FLUSH, null);
-		}
-	}
+//	private void speakMessage() {
+//		// TODO: we should really require the keyguard be unlocked here if we
+//		// are in privacy mode
+//
+//		// If not previously initialized...
+//		if (androidTts == null) {
+//
+//			// Show a loading dialog
+//			showDialog(DIALOG_LOADING);
+//
+//			// User interacted so remove all locks and cancel reminders
+//			ClearAllReceiver.removeCancel(getApplicationContext());
+//			ClearAllReceiver.clearAll(false);
+//			ReminderService.cancelReminder(getApplicationContext());
+//
+//			// We'll use update notification to stop the sound playing
+//			ManageNotification.update(this, smsPopupPager.getActiveMessage(),
+//					smsPopupPager.getPageCount());
+//
+//			androidTts = new TextToSpeech(SmsPopupActivity.this,
+//					androidTtsListener);
+//
+//		} else {
+//			androidTts.speak(smsPopupPager.getActiveMessage().getMessageBody(),
+//					TextToSpeech.QUEUE_FLUSH, null);
+//		}
+//	}
 
 	/**
 	 * Close the message window/popup, mark the message read if the user has
@@ -1175,32 +885,32 @@ public class SmsPopupActivity extends FragmentActivity implements
 	// }
 	// }
 	// }
-
-	/**
-	 * Show the quick reply dialog, resetting the text in the edittext and
-	 * storing the current SmsMmsMessage (in case another message comes in)
-	 */
-	private void quickReply() {
-		quickReplySmsMessage = smsPopupPager.getActiveMessage();
-		quickReply(quickReplySmsMessage.getReplyText());
-	}
-
-	/**
-	 * Show the quick reply dialog, if text passed is null or empty then store
-	 * the current SmsMmsMessage (in case another message comes in)
-	 */
-	private void quickReply(String text) {
-		// If this is a MMS or a SMS from email gateway or we're on KitKat then
-		// use regular reply
-		if (quickReplySmsMessage != null) {
-			if (quickReplySmsMessage.isMms() || quickReplySmsMessage.isEmail()) {
-				replyToMessage();
-			} else { // Else show the quick reply dialog
-				// updateQuickReplyView(text);
-				showDialog(DIALOG_QUICKREPLY);
-			}
-		}
-	}
+	//
+	// /**
+	// * Show the quick reply dialog, resetting the text in the edittext and
+	// * storing the current SmsMmsMessage (in case another message comes in)
+	// */
+	// private void quickReply() {
+	// quickReplySmsMessage = smsPopupPager.getActiveMessage();
+	// quickReply(quickReplySmsMessage.getReplyText());
+	// }
+	//
+	// /**
+	// * Show the quick reply dialog, if text passed is null or empty then store
+	// * the current SmsMmsMessage (in case another message comes in)
+	// */
+	// private void quickReply(String text) {
+	// // If this is a MMS or a SMS from email gateway or we're on KitKat then
+	// // use regular reply
+	// if (quickReplySmsMessage != null) {
+	// if (quickReplySmsMessage.isMms() || quickReplySmsMessage.isEmail()) {
+	// replyToMessage();
+	// } else { // Else show the quick reply dialog
+	// // updateQuickReplyView(text);
+	// showDialog(DIALOG_QUICKREPLY);
+	// }
+	// }
+	// }
 
 	/**
 	 * View contact that has the message address (or create if it doesn't exist)
@@ -1240,18 +950,18 @@ public class SmsPopupActivity extends FragmentActivity implements
 	// }
 	// }
 
-	private void storeQuickReplyText(String text) {
-		if (text != null) {
-			// Remove signature if present
-			if (signatureText != null && !"".equals(signatureText)
-					&& text.endsWith(signatureText)) {
-				smsPopupPager.getActiveMessage().setReplyText(
-						text.substring(0, text.lastIndexOf(signatureText)));
-			} else {
-				smsPopupPager.getActiveMessage().setReplyText(text);
-			}
-		}
-	}
+	// private void storeQuickReplyText(String text) {
+	// if (text != null) {
+	// // Remove signature if present
+	// if (signatureText != null && !"".equals(signatureText)
+	// && text.endsWith(signatureText)) {
+	// smsPopupPager.getActiveMessage().setReplyText(
+	// text.substring(0, text.lastIndexOf(signatureText)));
+	// } else {
+	// smsPopupPager.getActiveMessage().setReplyText(text);
+	// }
+	// }
+	// }
 
 	/**
 	 * Removes the active message
@@ -1303,9 +1013,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 
 	private class SmsPopupPagerAdapter extends FragmentStatePagerAdapter {
 
-		boolean isSame = false;
-		String smsStr;
-		
 		public SmsPopupPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
@@ -1318,85 +1025,13 @@ public class SmsPopupActivity extends FragmentActivity implements
 		@Override
 		public Fragment getItem(int position) {
 
-//			Log.v("TESTER MESSAGE: " + "POS: " + position + "   Infor: "
-//					+ smsPopupPager.getMessage(position));
-//
-//			if (position < 1) {
-//				return SmsPopupFragment.newInstance(
-//						smsPopupPager.getMessage(position), buttonTypes,
-//						privacyMode, showUnlockButton, showButtons);
-//			} else {
-//
-//				for (int j = 0; j < position; j++) {
-//
-//					if (smsPopupPager.getMessage(position).getAddress()
-//							.equals(smsPopupPager.getMessage(j).getAddress())) {
-//
-//						listSms.add(smsPopupPager.getMessage(j));
-//
-//						Log.v("TESTER MESSAGE same Phone: " + "POS: "
-//								+ position + "   Infor: "
-//								+ smsPopupPager.getMessage(position));
-//						
-//						isSame = true;
-//						
-//						smsStr += smsPopupPager.getMessage(j).getMessageBody();
-//						
-////						SmsPopupFragment.updateText("\n"
-////								+ smsPopupPager.getMessage(j).getMessageBody());
-//
-//						//return null;
-//						// return SmsPopupFragment.newInstance(
-//						// smsPopupPager.getMessage(position), buttonTypes,
-//						// privacyMode, showUnlockButton, showButtons);
-//					} else {
-//						isSame = false;
-//						Log.v("TESTER MESSAGE Diff Phone: " + "POS: "
-//								+ position + "   Infor: "
-//								+ smsPopupPager.getMessage(position));
-////						return SmsPopupFragment.newInstance(
-////								smsPopupPager.getMessage(position),
-////								buttonTypes, privacyMode, showUnlockButton,
-////								showButtons);
-//
-//					}
-//				}
-//				
-//				if (isSame) {
-//					SmsPopupFragment sms = SmsPopupFragment.getInstance();
-//					sms.updateText(smsStr);
-//					return sms;
-//				}else {
-//					return SmsPopupFragment.newInstance(
-//							smsPopupPager.getMessage(position),
-//							buttonTypes, privacyMode, showUnlockButton,
-//							showButtons);
-//				}
-//
-//			}
+			return SmsPopupFragment.newInstance(smsPopupPager
+					.getMessage(position));
 
-			return SmsPopupFragment.newInstance(
-					smsPopupPager.getMessage(position), buttonTypes,
-					privacyMode, showUnlockButton, showButtons);
+			// return SmsPopupFragment.newInstance(
+			// smsPopupPager.getMessage(position), buttonTypes,
+			// privacyMode, showUnlockButton, showButtons);
 		}
-
-		// public void setPrivacy(int privacyMode) {
-		// for (int i = 0; i < mFragments.size(); i++) {
-		// if (mFragments.get(i) != null) {
-		// ((SmsPopupFragment) mFragments.get(i))
-		// .setPrivacy(privacyMode);
-		// }
-		// }
-		// }
-
-		// public void unlockScreen() {
-		// for (int i = 0; i < mFragments.size(); i++) {
-		// if (mFragments.get(i) != null) {
-		// ((SmsPopupFragment) mFragments.get(i))
-		// .setShowUnlockButton(false);
-		// }
-		// }
-		// }
 
 		@Override
 		public int getItemPosition(Object object) {
@@ -1407,30 +1042,18 @@ public class SmsPopupActivity extends FragmentActivity implements
 			return idx;
 		}
 
-		// public void resizeFragments(int width, int height) {
-		// for (int i = 0; i < mFragments.size(); i++) {
-		// if (mFragments.get(i) != null) {
-		// ((SmsPopupFragment) mFragments.get(i)).resizeLayout(width,
-		// height);
-		// }
-		// }
-		// }
 	}
-
-	// private void setPrivacy(int mode) {
-	// privacyMode = mode;
-	// smsPopupPagerAdapter.setPrivacy(privacyMode);
-	// refreshViews();
-	// }
 
 	@Override
 	public void onButtonClicked(int buttonType) {
 		switch (buttonType) {
 		case ButtonListPreference.BUTTON_DISABLED: // Disabled
 			break;
-		case ButtonListPreference.BUTTON_CLOSE: // Close
+		case IConstant.TRANFER_CLOSE: // Close
 			closeMessage();
+			removeActiveMessage();
 			break;
+
 		// case ButtonListPreference.BUTTON_DELETE: // Delete
 		// showDialog(DIALOG_DELETE);
 		// break;
@@ -1457,9 +1080,9 @@ public class SmsPopupActivity extends FragmentActivity implements
 		case ButtonListPreference.BUTTON_INBOX: // Inbox
 			gotoInbox();
 			break;
-		case ButtonListPreference.BUTTON_TTS: // Text-to-Speech
-			speakMessage();
-			break;
+//		case ButtonListPreference.BUTTON_TTS: // Text-to-Speech
+//			speakMessage();
+//			break;
 		case SmsPopupFragment.BUTTON_VIEW:
 			unlockScreen();
 			break;

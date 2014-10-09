@@ -7,10 +7,10 @@ import java.util.ArrayList;
 
 import net.everythingandroid.smspopup.BuildConfig;
 import net.everythingandroid.smspopup.R;
+import net.everythingandroid.smspopup.constant.IConstant;
 import net.everythingandroid.smspopup.controls.QmTextWatcher;
 import net.everythingandroid.smspopup.preferences.ButtonListPreference;
 import net.everythingandroid.smspopup.provider.GridEmotionAdapter;
-import net.everythingandroid.smspopup.provider.IConstant;
 import net.everythingandroid.smspopup.provider.SmsMmsMessage;
 import net.everythingandroid.smspopup.service.SmsPopupUtilsService;
 import net.everythingandroid.smspopup.util.Log;
@@ -68,19 +68,9 @@ public class SmsPopupFragment extends Fragment {
 	private ImageView imgCall;
 	private TextView timestampTv;
 	private static TextView messageTv;
-	// private LinearLayout mainLayout;
 	// private ScrollView contentMessage;
 	// private LinearLayout contentMms;
-	// private LinearLayout contentPrivacy;
-	// private int contentNum = 0;
-
-	// private int privacyMode = PRIVACY_MODE_OFF;
-	// private boolean showUnlockButton = false;
-	// private boolean showButtons = true;
-
-	// private QuickContactBadge contactBadge;
 	private ImageView imgContactPhoto, imgEmotion;
-	// private ViewSwitcher buttonViewSwitcher;
 
 	public static final int PRIVACY_MODE_OFF = 0;
 	public static final int PRIVACY_MODE_HIDE_MESSAGE = 1;
@@ -109,23 +99,12 @@ public class SmsPopupFragment extends Fragment {
 
 	private static SmsPopupFragment frag;
 
-	public static SmsPopupFragment newInstance(SmsMmsMessage newMessage,
-			int[] buttons, int privacyMode, boolean showUnlockButton,
-			boolean showButtons) {
+	public static SmsPopupFragment newInstance(SmsMmsMessage newMessage) {
 
 		SmsPopupFragment newFragment = new SmsPopupFragment();
 		Bundle args = newMessage.toBundle();
-		args.putInt(EXTRA_PRIVACY_MODE, privacyMode);
-		args.putIntArray(EXTRA_BUTTONS, buttons);
-		args.putBoolean(EXTRA_UNLOCK_BUTTON, showUnlockButton);
-		args.putBoolean(EXTRA_SHOW_BUTTONS, showButtons);
 		newFragment.setArguments(args);
 		return newFragment;
-	}
-
-	public static SmsPopupFragment newInstance(SmsMmsMessage newMessage,
-			int[] buttons) {
-		return newInstance(newMessage, buttons, PRIVACY_MODE_OFF, false, true);
 	}
 
 	public static SmsPopupFragment getInstance() {
@@ -148,15 +127,10 @@ public class SmsPopupFragment extends Fragment {
 		final Bundle args = getArguments();
 		message = new SmsMmsMessage(getActivity(), args);
 
-		android.util.Log.i("onCreateView message: ", message.getAddress());
-
 		View v = inflater.inflate(R.layout.custom_sms_dialog, container, false);
 
 		quickreplyTextView = (TextView) v.findViewById(R.id.QuickReplyTextView);
 		qrEditText = (EditText) v.findViewById(R.id.QuickReplyEditText);
-
-		// Find the main textviews and layouts
-
 		imgEmotion = (ImageView) v.findViewById(R.id.imgEmotion);
 		fromTv = (TextView) v.findViewById(R.id.fromTextView);
 		messageTv = (TextView) v.findViewById(R.id.messageTextView);
@@ -168,14 +142,7 @@ public class SmsPopupFragment extends Fragment {
 		// contentMessage = (ScrollView) v.findViewById(R.id.contentMessage);
 		// contentMms = (LinearLayout) v.findViewById(R.id.contentMms);
 
-		// Find the QuickContactBadge view that will show the contact photo
 		imgContactPhoto = (ImageView) v.findViewById(R.id.imgAvatar);
-		//
-		// final String[] buttonText = getResources().getStringArray(
-		// R.array.buttons_text);
-
-		// android.util.Log.i("buttonText: ", buttons[0]+ " " +
-		// buttonText[buttons[0]]);
 
 		imgCall.setOnClickListener(new OnClickListener() {
 
@@ -198,16 +165,13 @@ public class SmsPopupFragment extends Fragment {
 			}
 		});
 
-		// if (showButtons) {
 		final ImageView button1 = (ImageView) v.findViewById(R.id.imgCancel);
-		// final PopupButton button1Vals = new PopupButton(buttons[0],
-		// buttonText);
 		button1.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				if (mButtonsListener != null) {
-					mButtonsListener.onButtonClicked(1);
+					mButtonsListener.onButtonClicked(IConstant.TRANFER_CLOSE);
 				} else {
 
 				}
@@ -217,7 +181,7 @@ public class SmsPopupFragment extends Fragment {
 
 		final ImageView imgEnter = (ImageView) v.findViewById(R.id.imgEnter);
 		imgEnter.setEnabled(false);
-		
+
 		qrEditText.addTextChangedListener(new QmTextWatcher(getActivity(),
 				qrCounterTextView, imgEnter));
 
@@ -225,7 +189,7 @@ public class SmsPopupFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				sendQuickReply(qrEditText.getText().toString());
-				mButtonsListener.onButtonClicked(1);
+				//mButtonsListener.onButtonClicked(IConstant.TRANFER_CLOSE);
 				qrEditText.setText("");
 			}
 		});
@@ -282,11 +246,7 @@ public class SmsPopupFragment extends Fragment {
 			imgContactPhoto.setImageBitmap(bm);
 		}
 
-		// loadContactPhoto();
 		timestampTv.setText(message.getFormattedTimestamp());
-
-		// setPrivacy(privacyMode, true);
-		// refreshButtonViews();
 	}
 
 	public Bitmap setPhoto(String phone) {
@@ -314,7 +274,6 @@ public class SmsPopupFragment extends Fragment {
 	 * Sends the actual quick reply message
 	 */
 	private void sendQuickReply(String quickReplyMessage) {
-		// hideSoftKeyboard();
 		if (quickReplyMessage != null) {
 			if (quickReplyMessage.length() > 0 && message != null) {
 				Intent i = new Intent(getActivity().getApplicationContext(),
@@ -322,6 +281,7 @@ public class SmsPopupFragment extends Fragment {
 				i.setAction(SmsPopupUtilsService.ACTION_QUICKREPLY);
 				i.putExtras(message.toBundle());
 				i.putExtra(SmsMmsMessage.EXTRAS_QUICKREPLY, quickReplyMessage);
+
 				if (BuildConfig.DEBUG)
 					Log.v("Sending message to " + message.getContactName());
 				WakefulBroadcastReceiver.startWakefulService(getActivity()
@@ -329,8 +289,6 @@ public class SmsPopupFragment extends Fragment {
 				Toast.makeText(getActivity(),
 						R.string.quickreply_sending_toast, Toast.LENGTH_LONG)
 						.show();
-				// dismissDialog(DIALOG_QUICKREPLY);
-				// removeActiveMessage();
 			} else {
 				Toast.makeText(getActivity(),
 						R.string.quickreply_nomessage_toast, Toast.LENGTH_LONG)
@@ -531,52 +489,53 @@ public class SmsPopupFragment extends Fragment {
 
 	}
 
-	private class FetchContactPhotoTask extends AsyncTask<Uri, Integer, Bitmap> {
-		private final WeakReference<QuickContactBadge> viewReference;
-
-		public FetchContactPhotoTask(QuickContactBadge badge) {
-			viewReference = new WeakReference<QuickContactBadge>(badge);
-		}
-
-		@Override
-		protected Bitmap doInBackground(Uri... params) {
-			if (isAdded()) {
-				// if (BuildConfig.DEBUG)
-				// Log.v("Loading contact photo in background...");
-				// final Bitmap bitmap = SmsPopupUtils.getPersonPhoto(
-				// getActivity(), params[0]);
-				// if (mButtonsListener != null && bitmap != null) {
-				// final LruCache<Uri, Bitmap> cache = mButtonsListener
-				// .getCache();
-				// if (cache != null) {
-				// cache.put(params[0], bitmap);
-				// }
-				// }
-
-				// return bitmap;
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Bitmap photo) {
-			if (BuildConfig.DEBUG)
-				Log.v("Done loading contact photo");
-			if (photo != null && viewReference != null) {
-				final QuickContactBadge badge = viewReference.get();
-				if (badge != null && isAdded()) {
-					TransitionDrawable mTd = new TransitionDrawable(
-							new Drawable[] {
-									getResources().getDrawable(
-											R.drawable.ic_contact_picture),
-									new BitmapDrawable(getResources(), photo) });
-					badge.setImageDrawable(mTd);
-					mTd.setCrossFadeEnabled(false);
-					mTd.startTransition(CONTACT_IMAGE_FADE_DURATION);
-				}
-			}
-		}
-	}
+	// private class FetchContactPhotoTask extends AsyncTask<Uri, Integer,
+	// Bitmap> {
+	// private final WeakReference<QuickContactBadge> viewReference;
+	//
+	// public FetchContactPhotoTask(QuickContactBadge badge) {
+	// viewReference = new WeakReference<QuickContactBadge>(badge);
+	// }
+	//
+	// @Override
+	// protected Bitmap doInBackground(Uri... params) {
+	// if (isAdded()) {
+	// // if (BuildConfig.DEBUG)
+	// // Log.v("Loading contact photo in background...");
+	// // final Bitmap bitmap = SmsPopupUtils.getPersonPhoto(
+	// // getActivity(), params[0]);
+	// // if (mButtonsListener != null && bitmap != null) {
+	// // final LruCache<Uri, Bitmap> cache = mButtonsListener
+	// // .getCache();
+	// // if (cache != null) {
+	// // cache.put(params[0], bitmap);
+	// // }
+	// // }
+	//
+	// // return bitmap;
+	// }
+	// return null;
+	// }
+	//
+	// @Override
+	// protected void onPostExecute(Bitmap photo) {
+	// if (BuildConfig.DEBUG)
+	// Log.v("Done loading contact photo");
+	// if (photo != null && viewReference != null) {
+	// final QuickContactBadge badge = viewReference.get();
+	// if (badge != null && isAdded()) {
+	// TransitionDrawable mTd = new TransitionDrawable(
+	// new Drawable[] {
+	// getResources().getDrawable(
+	// R.drawable.ic_contact_picture),
+	// new BitmapDrawable(getResources(), photo) });
+	// badge.setImageDrawable(mTd);
+	// mTd.setCrossFadeEnabled(false);
+	// mTd.startTransition(CONTACT_IMAGE_FADE_DURATION);
+	// }
+	// }
+	// }
+	// }
 
 	// private class PopupButton implements OnClickListener {
 	// final private int buttonId;

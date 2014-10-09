@@ -69,7 +69,6 @@
             android:text="Timestamp here"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="?android:attr/textColorPrimaryDisableOnly"
-            android:textStyle="bold"
             tools:ignore="HardcodedText" />
     </RelativeLayout>
 

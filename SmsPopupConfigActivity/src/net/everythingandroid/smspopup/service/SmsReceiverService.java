@@ -165,10 +165,10 @@ public class SmsReceiverService extends IntentService {
 //                        ContactNotifications.POPUP_ENABLED);
 
         // check if notifications are on for this contact
-        boolean notifEnabled =
-                mPrefs.getBoolean(R.string.pref_notif_enabled_key,
-                        Defaults.PREFS_NOTIF_ENABLED,
-                        ContactNotifications.ENABLED);
+//        boolean notifEnabled =
+//                mPrefs.getBoolean(R.string.pref_notif_enabled_key,
+//                        Defaults.PREFS_NOTIF_ENABLED,
+//                        ContactNotifications.ENABLED);
 
         // get docked state of phone
         boolean docked = mPrefs.getInt(R.string.pref_docked_key, Intent.EXTRA_DOCK_STATE_UNDOCKED)
@@ -183,7 +183,7 @@ public class SmsReceiverService extends IntentService {
         boolean callStateIdle = mTM.getCallState() == TelephonyManager.CALL_STATE_IDLE;
 
         // Init keyguard manager
-        ManageKeyguard.initialize(context);
+      //  ManageKeyguard.initialize(context);
 
         /*
          * If popup is enabled for this user -AND- the user is not in a call --AND- phone is
@@ -198,6 +198,7 @@ public class SmsReceiverService extends IntentService {
             if (BuildConfig.DEBUG)
                 Log.v("Showing SMS Popup: " + message.getAddress());
             //ManageWakeLock.acquirePartial(context);
+            
             context.startActivity(message.getPopupIntent());
 
         } 

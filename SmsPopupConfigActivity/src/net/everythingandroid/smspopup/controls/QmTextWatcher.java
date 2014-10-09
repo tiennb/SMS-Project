@@ -54,11 +54,6 @@ public class QmTextWatcher implements TextWatcher {
 			}
 		}
 
-		// if (s.length() < (80 - CHARS_REMAINING_BEFORE_COUNTER_SHOWN)) {
-		// mTextView.setVisibility(View.GONE);
-		// return;
-		// }
-
 		/*
 		 * SmsMessage.calculateLength returns an int[4] with: int[0] being the
 		 * number of SMS's required, int[1] the number of code units used,
@@ -69,10 +64,6 @@ public class QmTextWatcher implements TextWatcher {
 
 		int charsCount = params[1];
 		int msgCount = params[0];
-		int remainingInCurrentMessage = params[2];
-
-		Log.i("Count: ", params[0] + " " + params[1] + " " + params[2] + " "
-				+ params[3] + " ");
 
 		if (params[3] == 1) {
 			MAX_CHARS = 160;
