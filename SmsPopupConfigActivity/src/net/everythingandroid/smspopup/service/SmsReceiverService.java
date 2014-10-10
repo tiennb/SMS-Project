@@ -200,7 +200,6 @@ public class SmsReceiverService extends IntentService {
             //ManageWakeLock.acquirePartial(context);
             
             context.startActivity(message.getPopupIntent());
-
         } 
         
 ////        else if (notifEnabled) {

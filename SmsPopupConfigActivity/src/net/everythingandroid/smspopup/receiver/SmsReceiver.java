@@ -10,12 +10,12 @@ import net.everythingandroid.smspopup.util.Log;
 
 public class SmsReceiver extends WakefulBroadcastReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (BuildConfig.DEBUG)
-            Log.v("SMSReceiver: onReceive()");
-        intent.setClass(context, SmsReceiverService.class);
-        intent.putExtra("result", getResultCode());
-        startWakefulService(context, intent);
-    }
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		if (BuildConfig.DEBUG)
+			Log.v("SMSReceiver: onReceive()");
+		intent.setClass(context, SmsReceiverService.class);
+		intent.putExtra("result", getResultCode());
+		startWakefulService(context, intent);
+	}
 }

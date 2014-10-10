@@ -98,7 +98,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 	// private EditText qrEditText;
 	private ProgressDialog mProgressDialog;
 
-	private SmsPopupPager smsPopupPager;
+	private SmsPopupPager smsPopupPager;// Viewpager
 	private SmsPopupPagerAdapter smsPopupPagerAdapter;
 	private CirclePageIndicator pagerIndicator;
 	private LruCache<Uri, Bitmap> mBitmapCache = null;
@@ -272,10 +272,19 @@ public class SmsPopupActivity extends FragmentActivity implements
 		message.locateMessageId();
 
 		if (newIntent) {
-			smsPopupPager.addMessage(message);
+
+			// smsPopupPager.getActiveMessageNum();
+			Log.v("message == null  " + message);
+			//smsPopupPager.addMessage(message);
+			
+			
+			
 			wakeApp();
 		} else {
 			if (message != null) {
+
+				Log.v("message != null   " +  message);
+
 				new LoadUnreadMessagesAsyncTask().execute(message);
 			}
 		}
@@ -358,9 +367,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 		@Override
 		protected void onPostExecute(ArrayList<SmsMmsMessage> result) {
 			mProgressBar.setVisibility(View.GONE);
-
-			android.util.Log.i("smsPopupPager.ADD:", result.size() + "");
-
 			smsPopupPager.addMessages(result);
 			smsPopupPager.showLast();
 			wakeApp();
@@ -590,7 +596,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 		return null;
 	}
 
-
 	/**
 	 * Handle the results from the recognition activity.
 	 */
@@ -695,31 +700,32 @@ public class SmsPopupActivity extends FragmentActivity implements
 		case CONTEXT_INBOX_ID:
 			gotoInbox();
 			break;
-//		case CONTEXT_TTS_ID:
-//			speakMessage();
-//			break;
+		// case CONTEXT_TTS_ID:
+		// speakMessage();
+		// break;
 		case CONTEXT_VIEWCONTACT_ID:
 			viewContact();
 			break;
 		}
 		return super.onContextItemSelected(item);
 	}
-//
-//	// The Android text-to-speech library OnInitListener (via wrapper class)
-//	private final OnInitListener androidTtsListener = new OnInitListener() {
-//		@Override
-//		public void onInit(int status) {
-//			if (mProgressDialog != null) {
-//				mProgressDialog.dismiss();
-//			}
-//			if (status == TextToSpeech.SUCCESS) {
-//				speakMessage();
-//			} else {
-//				Toast.makeText(SmsPopupActivity.this, R.string.error_message,
-//						Toast.LENGTH_SHORT);
-//			}
-//		}
-//	};
+
+	//
+	// // The Android text-to-speech library OnInitListener (via wrapper class)
+	// private final OnInitListener androidTtsListener = new OnInitListener() {
+	// @Override
+	// public void onInit(int status) {
+	// if (mProgressDialog != null) {
+	// mProgressDialog.dismiss();
+	// }
+	// if (status == TextToSpeech.SUCCESS) {
+	// speakMessage();
+	// } else {
+	// Toast.makeText(SmsPopupActivity.this, R.string.error_message,
+	// Toast.LENGTH_SHORT);
+	// }
+	// }
+	// };
 
 	/*
 	 * *****************************************************************************
@@ -732,33 +738,33 @@ public class SmsPopupActivity extends FragmentActivity implements
 	 * Speak the message out loud using text-to-speech (either via Android
 	 * text-to-speech or via the free eyes-free text-to-speech library)
 	 */
-//	private void speakMessage() {
-//		// TODO: we should really require the keyguard be unlocked here if we
-//		// are in privacy mode
-//
-//		// If not previously initialized...
-//		if (androidTts == null) {
-//
-//			// Show a loading dialog
-//			showDialog(DIALOG_LOADING);
-//
-//			// User interacted so remove all locks and cancel reminders
-//			ClearAllReceiver.removeCancel(getApplicationContext());
-//			ClearAllReceiver.clearAll(false);
-//			ReminderService.cancelReminder(getApplicationContext());
-//
-//			// We'll use update notification to stop the sound playing
-//			ManageNotification.update(this, smsPopupPager.getActiveMessage(),
-//					smsPopupPager.getPageCount());
-//
-//			androidTts = new TextToSpeech(SmsPopupActivity.this,
-//					androidTtsListener);
-//
-//		} else {
-//			androidTts.speak(smsPopupPager.getActiveMessage().getMessageBody(),
-//					TextToSpeech.QUEUE_FLUSH, null);
-//		}
-//	}
+	// private void speakMessage() {
+	// // TODO: we should really require the keyguard be unlocked here if we
+	// // are in privacy mode
+	//
+	// // If not previously initialized...
+	// if (androidTts == null) {
+	//
+	// // Show a loading dialog
+	// showDialog(DIALOG_LOADING);
+	//
+	// // User interacted so remove all locks and cancel reminders
+	// ClearAllReceiver.removeCancel(getApplicationContext());
+	// ClearAllReceiver.clearAll(false);
+	// ReminderService.cancelReminder(getApplicationContext());
+	//
+	// // We'll use update notification to stop the sound playing
+	// ManageNotification.update(this, smsPopupPager.getActiveMessage(),
+	// smsPopupPager.getPageCount());
+	//
+	// androidTts = new TextToSpeech(SmsPopupActivity.this,
+	// androidTtsListener);
+	//
+	// } else {
+	// androidTts.speak(smsPopupPager.getActiveMessage().getMessageBody(),
+	// TextToSpeech.QUEUE_FLUSH, null);
+	// }
+	// }
 
 	/**
 	 * Close the message window/popup, mark the message read if the user has
@@ -1080,9 +1086,9 @@ public class SmsPopupActivity extends FragmentActivity implements
 		case ButtonListPreference.BUTTON_INBOX: // Inbox
 			gotoInbox();
 			break;
-//		case ButtonListPreference.BUTTON_TTS: // Text-to-Speech
-//			speakMessage();
-//			break;
+		// case ButtonListPreference.BUTTON_TTS: // Text-to-Speech
+		// speakMessage();
+		// break;
 		case SmsPopupFragment.BUTTON_VIEW:
 			unlockScreen();
 			break;
