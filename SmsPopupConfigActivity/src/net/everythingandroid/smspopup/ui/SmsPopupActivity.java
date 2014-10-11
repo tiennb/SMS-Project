@@ -289,6 +289,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 				} else {
 					// update sms to Popup is showing
 					Log.v("Same User send message");
+					SmsPopupFragment.updateText(message.getMessageBody());
 				}
 
 			}

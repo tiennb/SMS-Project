@@ -573,7 +573,7 @@ public class SmsPopupFragment extends Fragment {
 		// abstract LruCache<Uri, Bitmap> getCache();
 	}
 
-	public void updateText(String text) {
+	public static void updateText(String text) {
 		messageTv.append(text);
 	}
 
