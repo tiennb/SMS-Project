@@ -86,6 +86,7 @@ import net.everythingandroid.smspopup.util.SmsPopupUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class SmsPopupActivity extends FragmentActivity implements
 		SmsPopupButtonsListener {
@@ -129,7 +130,8 @@ public class SmsPopupActivity extends FragmentActivity implements
 	private static final int VOICE_RECOGNITION_REQUEST_CODE = 8888;
 
 	private static final int BITMAP_CACHE_SIZE = 8;
-
+	SmsMmsMessage message2;
+	SmsMmsMessage message1;
 	// private TextView quickreplyTextView;
 	private SmsMmsMessage quickReplySmsMessage;
 
@@ -156,9 +158,14 @@ public class SmsPopupActivity extends FragmentActivity implements
 		setupViews();
 
 		if (bundle == null) { // new activity
+			// First mess
+			// Create message from bundle
+			// message1 = new SmsMmsMessage(getApplicationContext(), getIntent()
+			// .getExtras());
+			// Log.v("SMS is incomming!!!!!" + message1);
 
-			Log.v("SMS is incomming!!!!!");
 			initializeMessagesAndWake(getIntent().getExtras());
+
 		} else { // this activity was recreated after being destroyed
 			Log.v(" SMS is incomming!!!!! ELSE");
 			initializeMessagesAndWake(bundle);
@@ -254,7 +261,15 @@ public class SmsPopupActivity extends FragmentActivity implements
 	}
 
 	private void initializeMessagesAndWake(Bundle b) {
-		initializeMessagesAndWake(b, false);
+		initializeMessagesAndWake(b, false); // Showed
+	}
+
+	public String getPhoneNum(String phone) {
+		String exPhone;
+		exPhone = phone.substring(phone.indexOf("+"), phone.length());
+		exPhone = phone.substring(0, phone.indexOf(","));
+
+		return exPhone;
 	}
 
 	/**
@@ -270,22 +285,60 @@ public class SmsPopupActivity extends FragmentActivity implements
 		// Create message from bundle
 		SmsMmsMessage message = new SmsMmsMessage(getApplicationContext(), b);
 		message.locateMessageId();
+		LoadUnreadMessagesAsyncTask taks = new LoadUnreadMessagesAsyncTask();
 
+		// Mess > 2
 		if (newIntent) {
 
+			Log.v("Second message incoming:   " + message);
+			// final SmsMmsMessage newMessage = args[0];
 			// smsPopupPager.getActiveMessageNum();
-			Log.v("message == null  " + message);
-			//smsPopupPager.addMessage(message);
+
+			String sms = message.toString();
 			
+			//sms= sms.substring(sms.indexOf("+"), sms.length());
 			
-			
+
+			Log.v("Second message incoming 1:   " + sms);
+			Log.v("Second message incoming 2:   " + message2.getMessageBody());
+
+			if (message1.getAddress() != message.getAddress()) {
+				smsPopupPager.addMessage(message);
+			} else {
+				Log.v("Message is the same  ");
+			}
+
+			// message2 = message;
+
+			// try {
+			//
+			// Log.v("message == null  " + taks.get().get(0).getAddress());
+			// taks.get().get(0).getAddress();
+			// } catch (InterruptedException e) {
+			// // TODO Auto-generated catch block
+			// e.printStackTrace();
+			// } catch (ExecutionException e) {
+			// // TODO Auto-generated catch block
+			// e.printStackTrace();
+			// }
+
 			wakeApp();
 		} else {
+
+			// First SMS
 			if (message != null) {
 
-				Log.v("message != null   " +  message);
-
-				new LoadUnreadMessagesAsyncTask().execute(message);
+				Log.v("First message incoming:   " + message);
+				
+				String str="";
+				
+				str = message.toString();
+				
+				
+				
+				Log.v("First message incoming:   " + str.length());
+				message1 = message;
+				taks.execute(message);
 			}
 		}
 	}
@@ -508,6 +561,9 @@ public class SmsPopupActivity extends FragmentActivity implements
 
 		// Update intent held by activity
 		setIntent(intent);
+
+		message2 = new SmsMmsMessage(getApplicationContext(),
+				intent.getExtras());
 
 		// Setup messages
 		initializeMessagesAndWake(intent.getExtras(), true);
