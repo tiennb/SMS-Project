@@ -96,6 +96,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 	private InputMethodManager inputManager;
 	private View inputView;
 
+	String numPhone = "---";
 	// private EditText qrEditText;
 	private ProgressDialog mProgressDialog;
 
@@ -135,6 +136,8 @@ public class SmsPopupActivity extends FragmentActivity implements
 	// private TextView quickreplyTextView;
 	private SmsMmsMessage quickReplySmsMessage;
 
+	ArrayList<SmsMmsMessage> listMessageShowing;
+
 	private Cursor mCursor = null;
 
 	private int[] buttonTypes;
@@ -159,10 +162,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 
 		if (bundle == null) { // new activity
 			// First mess
-			// Create message from bundle
-			// message1 = new SmsMmsMessage(getApplicationContext(), getIntent()
-			// .getExtras());
-			// Log.v("SMS is incomming!!!!!" + message1);
+			listMessageShowing = new ArrayList<SmsMmsMessage>();
 
 			initializeMessagesAndWake(getIntent().getExtras());
 
@@ -264,14 +264,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 		initializeMessagesAndWake(b, false); // Showed
 	}
 
-	public String getPhoneNum(String phone) {
-		String exPhone;
-		exPhone = phone.substring(phone.indexOf("+"), phone.length());
-		exPhone = phone.substring(0, phone.indexOf(","));
-
-		return exPhone;
-	}
-
 	/**
 	 * Setup messages within the popup given an intent bundle
 	 *
@@ -290,54 +282,22 @@ public class SmsPopupActivity extends FragmentActivity implements
 		// Mess > 2
 		if (newIntent) {
 
-			Log.v("Second message incoming:   " + message);
-			// final SmsMmsMessage newMessage = args[0];
-			// smsPopupPager.getActiveMessageNum();
+			for (SmsMmsMessage i : listMessageShowing) {
+				if (!message.getAddress().equals(i.getAddress())) {
+					smsPopupPager.addMessage(message);
+					listMessageShowing.add(message);
+				} else {
+					// update sms to Popup is showing
+					Log.v("Same User send message");
+				}
 
-			String sms = message.toString();
-			
-			//sms= sms.substring(sms.indexOf("+"), sms.length());
-			
-
-			Log.v("Second message incoming 1:   " + sms);
-			Log.v("Second message incoming 2:   " + message2.getMessageBody());
-
-			if (message1.getAddress() != message.getAddress()) {
-				smsPopupPager.addMessage(message);
-			} else {
-				Log.v("Message is the same  ");
 			}
-
-			// message2 = message;
-
-			// try {
-			//
-			// Log.v("message == null  " + taks.get().get(0).getAddress());
-			// taks.get().get(0).getAddress();
-			// } catch (InterruptedException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// } catch (ExecutionException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
-
 			wakeApp();
 		} else {
 
 			// First SMS
 			if (message != null) {
-
-				Log.v("First message incoming:   " + message);
-				
-				String str="";
-				
-				str = message.toString();
-				
-				
-				
-				Log.v("First message incoming:   " + str.length());
-				message1 = message;
+				listMessageShowing.add(message);
 				taks.execute(message);
 			}
 		}
@@ -371,6 +331,7 @@ public class SmsPopupActivity extends FragmentActivity implements
 				// Otherwise we now have an array of unread messages
 				final long messageId = newMessage.getMessageId();
 				final String phone = newMessage.getAddress();
+
 				// We have to deal with a system race condition now, what if the
 				// new message isn't
 				// yet in the system database? In that case, messageId will be 0
@@ -561,9 +522,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 
 		// Update intent held by activity
 		setIntent(intent);
-
-		message2 = new SmsMmsMessage(getApplicationContext(),
-				intent.getExtras());
 
 		// Setup messages
 		initializeMessagesAndWake(intent.getExtras(), true);
