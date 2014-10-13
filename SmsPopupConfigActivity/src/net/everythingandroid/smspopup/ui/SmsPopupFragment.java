@@ -2,17 +2,18 @@ package net.everythingandroid.smspopup.ui;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import net.everythingandroid.smspopup.BuildConfig;
 import net.everythingandroid.smspopup.R;
 import net.everythingandroid.smspopup.constant.IConstant;
 import net.everythingandroid.smspopup.controls.QmTextWatcher;
-import net.everythingandroid.smspopup.preferences.ButtonListPreference;
+import net.everythingandroid.smspopup.provider.ChatMessageAdapter;
 import net.everythingandroid.smspopup.provider.GridEmotionAdapter;
 import net.everythingandroid.smspopup.provider.SmsMmsMessage;
 import net.everythingandroid.smspopup.service.SmsPopupUtilsService;
+import net.everythingandroid.smspopup.util.ChatMessage;
 import net.everythingandroid.smspopup.util.Log;
 import android.app.Activity;
 import android.content.Context;
@@ -21,35 +22,27 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.WakefulBroadcastReceiver;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.QuickContactBadge;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 public class SmsPopupFragment extends Fragment {
@@ -67,7 +60,11 @@ public class SmsPopupFragment extends Fragment {
 	private TextView fromTv;
 	private ImageView imgCall;
 	private TextView timestampTv;
-	private static TextView messageTv;
+	// private static TextView messageTv;
+	private static ListView chatList;
+	private static ArrayList<ChatMessage> chatMessages;
+	private static ChatMessageAdapter adapter;
+
 	// private ScrollView contentMessage;
 	// private LinearLayout contentMms;
 	private ImageView imgContactPhoto, imgEmotion;
@@ -133,14 +130,21 @@ public class SmsPopupFragment extends Fragment {
 		qrEditText = (EditText) v.findViewById(R.id.QuickReplyEditText);
 		imgEmotion = (ImageView) v.findViewById(R.id.imgEmotion);
 		fromTv = (TextView) v.findViewById(R.id.fromTextView);
-		messageTv = (TextView) v.findViewById(R.id.messageTextView);
+		// messageTv = (TextView) v.findViewById(R.id.messageTextView);
 		timestampTv = (TextView) v.findViewById(R.id.timestampTextView);
+		chatList = (ListView) v.findViewById(R.id.chatList);
 		imgCall = (ImageView) v.findViewById(R.id.imgCall);
 		final TextView qrCounterTextView = (TextView) v
 				.findViewById(R.id.QuickReplyCounterTextView);
 
-		// contentMessage = (ScrollView) v.findViewById(R.id.contentMessage);
-		// contentMms = (LinearLayout) v.findViewById(R.id.contentMms);
+		chatMessages = new ArrayList<ChatMessage>();
+
+		chatMessages.add(new ChatMessage(message.getMessageBody(), message
+				.getFormattedTimestamp().toString(), true));
+
+		adapter = new ChatMessageAdapter(getActivity(), chatMessages);
+
+		chatList.setAdapter(adapter);
 
 		imgContactPhoto = (ImageView) v.findViewById(R.id.imgAvatar);
 
@@ -189,7 +193,9 @@ public class SmsPopupFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				sendQuickReply(qrEditText.getText().toString());
-				//mButtonsListener.onButtonClicked(IConstant.TRANFER_CLOSE);
+				// mButtonsListener.onButtonClicked(IConstant.TRANFER_CLOSE);
+				addNewMessage(new ChatMessage(qrEditText.getText().toString(),
+						getTimeSender(), false));
 				qrEditText.setText("");
 			}
 		});
@@ -232,7 +238,7 @@ public class SmsPopupFragment extends Fragment {
 	 */
 	private void populateViews() {
 		if (message.isSms()) {
-			messageTv.setText(message.getMessageBody());
+			// messageTv.setText(message.getMessageBody());
 
 			quickreplyTextView.setText(message.getContactName());
 		}
@@ -574,7 +580,24 @@ public class SmsPopupFragment extends Fragment {
 	}
 
 	public static void updateText(String text) {
-		messageTv.append(text);
+		// messageTv.append(text);
+	}
+
+	public static void addNewMessage(ChatMessage m) {
+		chatMessages.add(m);
+		adapter.notifyDataSetChanged();
+		chatList.setSelection(chatMessages.size());
+	}
+
+	public String getTimeSender() {
+
+		long timeInMillis = System.currentTimeMillis();
+
+		SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+		String formattedDate = df.format(timeInMillis);
+
+		return formattedDate;
+
 	}
 
 }

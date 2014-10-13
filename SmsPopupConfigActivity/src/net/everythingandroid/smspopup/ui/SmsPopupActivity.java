@@ -73,6 +73,7 @@ import net.everythingandroid.smspopup.receiver.ClearAllReceiver;
 import net.everythingandroid.smspopup.service.ReminderService;
 import net.everythingandroid.smspopup.service.SmsPopupUtilsService;
 import net.everythingandroid.smspopup.ui.SmsPopupFragment.SmsPopupButtonsListener;
+import net.everythingandroid.smspopup.util.ChatMessage;
 import net.everythingandroid.smspopup.util.Eula;
 import net.everythingandroid.smspopup.util.Log;
 import net.everythingandroid.smspopup.util.ManageKeyguard;
@@ -289,7 +290,11 @@ public class SmsPopupActivity extends FragmentActivity implements
 				} else {
 					// update sms to Popup is showing
 					Log.v("Same User send message");
-					SmsPopupFragment.updateText(message.getMessageBody());
+					// SmsPopupFragment
+					// .updateText("\n\n" + message.getMessageBody());
+					SmsPopupFragment.addNewMessage(new ChatMessage(message
+							.getMessageBody(), message.getFormattedTimestamp()
+							.toString(), true));
 				}
 
 			}
@@ -1120,4 +1125,5 @@ public class SmsPopupActivity extends FragmentActivity implements
 	// public LruCache<Uri, Bitmap> getCache() {
 	// return mBitmapCache;
 	// }
+
 }
