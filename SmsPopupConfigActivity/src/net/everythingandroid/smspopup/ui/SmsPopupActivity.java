@@ -115,6 +115,8 @@ public class SmsPopupActivity extends FragmentActivity implements
 	private boolean showButtons = true;
 	private String signatureText;
 	private boolean hasNotified = false;
+	public static ArrayList<ChatMessage> chatMessages;
+	public static ArrayList<ArrayList<ChatMessage>> multiPopupMes;
 
 	private static final int DIALOG_DELETE = Menu.FIRST;
 	private static final int DIALOG_QUICKREPLY = Menu.FIRST + 1;
@@ -164,6 +166,10 @@ public class SmsPopupActivity extends FragmentActivity implements
 		if (bundle == null) { // new activity
 			// First mess
 			listMessageShowing = new ArrayList<SmsMmsMessage>();
+
+			chatMessages = new ArrayList<ChatMessage>();
+
+			multiPopupMes = new ArrayList<ArrayList<ChatMessage>>();
 
 			initializeMessagesAndWake(getIntent().getExtras());
 
@@ -285,16 +291,24 @@ public class SmsPopupActivity extends FragmentActivity implements
 
 			for (SmsMmsMessage i : listMessageShowing) {
 				if (!message.getAddress().equals(i.getAddress())) {
+
+					// chatMessages = new ArrayList<ChatMessage>();
+
+					// ArrayList<ChatMessage> multiPopupMes1 = new
+					// ArrayList<ChatMessage>();
+					// multiPopupMes1.add(message);
+
 					smsPopupPager.addMessage(message);
 					listMessageShowing.add(message);
+
 				} else {
 					// update sms to Popup is showing
 					Log.v("Same User send message");
-					// SmsPopupFragment
-					// .updateText("\n\n" + message.getMessageBody());
-					SmsPopupFragment.addNewMessage(new ChatMessage(message
-							.getMessageBody(), message.getFormattedTimestamp()
-							.toString(), true));
+					// SmsPopupFragment.addNewMessage(new ChatMessage(message
+					// .getMessageBody(), message.getFormattedTimestamp()
+					// .toString(), true));
+					SmsPopupFragment.updateText(message.getMessageBody(),
+							message.getFormattedTimestamp().toString());
 				}
 
 			}
@@ -1053,10 +1067,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 
 			return SmsPopupFragment.newInstance(smsPopupPager
 					.getMessage(position));
-
-			// return SmsPopupFragment.newInstance(
-			// smsPopupPager.getMessage(position), buttonTypes,
-			// privacyMode, showUnlockButton, showButtons);
 		}
 
 		@Override
@@ -1077,7 +1087,6 @@ public class SmsPopupActivity extends FragmentActivity implements
 			break;
 		case IConstant.TRANFER_CLOSE: // Close
 			closeMessage();
-			removeActiveMessage();
 			break;
 
 		// case ButtonListPreference.BUTTON_DELETE: // Delete

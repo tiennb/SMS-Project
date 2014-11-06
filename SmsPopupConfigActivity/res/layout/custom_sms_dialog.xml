@@ -58,18 +58,6 @@
             android:layout_alignLeft="@+id/QuickReplyTextView"
             android:layout_below="@+id/QuickReplyTextView"
             android:text="Sdt" />
-
-        <TextView
-            android:id="@+id/timestampTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:paddingBottom="12dp"
-            android:text="Timestamp here"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?android:attr/textColorPrimaryDisableOnly"
-            tools:ignore="HardcodedText" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -91,14 +79,13 @@
             android:contentDescription="@null"
             android:src="@drawable/ic_emotion" />
 
-
         <EditText
             android:id="@+id/QuickReplyEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/QuickReplyCounterTextView"
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
-            android:layout_below="@+id/QuickReplyCounterTextView"
             android:layout_toLeftOf="@+id/imgEnter"
             android:layout_toRightOf="@+id/imgEmotion"
             android:background="@drawable/bg_info"
@@ -132,10 +119,10 @@
             android:textColor="#88000000"
             android:textSize="11sp"
             android:textStyle="bold" />
-
     </RelativeLayout>
 
-     <ListView
+    <!--
+    <ListView
         android:id="@+id/chatList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -143,10 +130,11 @@
         android:layout_below="@+id/rlMenu"
         android:cacheColorHint="#00000000"
         android:divider="#00000000"
-        android:listSelector="#00000000" >
+        android:listSelector="#00000000" > 
     </ListView>
-    
-    <!-- <TextView
+    -->
+
+    <TextView
         android:id="@+id/messageTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -156,10 +144,10 @@
         android:gravity="center"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:scrollbars="vertical"
         android:text="Text here"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/black"
-        android:textColorLink="#33b5e5" /> -->
-    
+        android:textColorLink="#33b5e5" />
 
 </RelativeLayout>

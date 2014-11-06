@@ -28,6 +28,8 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.WakefulBroadcastReceiver;
+import android.text.Html;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,7 +42,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,10 +60,10 @@ public class SmsPopupFragment extends Fragment {
 
 	private TextView fromTv;
 	private ImageView imgCall;
-	private TextView timestampTv;
-	// private static TextView messageTv;
-	private static ListView chatList;
-	private static ArrayList<ChatMessage> chatMessages;
+	// private TextView timestampTv;
+	private static TextView messageTv;
+	// private static ListView chatList;
+
 	private static ChatMessageAdapter adapter;
 
 	// private ScrollView contentMessage;
@@ -130,21 +131,23 @@ public class SmsPopupFragment extends Fragment {
 		qrEditText = (EditText) v.findViewById(R.id.QuickReplyEditText);
 		imgEmotion = (ImageView) v.findViewById(R.id.imgEmotion);
 		fromTv = (TextView) v.findViewById(R.id.fromTextView);
-		// messageTv = (TextView) v.findViewById(R.id.messageTextView);
-		timestampTv = (TextView) v.findViewById(R.id.timestampTextView);
-		chatList = (ListView) v.findViewById(R.id.chatList);
+		messageTv = (TextView) v.findViewById(R.id.messageTextView);
+		// timestampTv = (TextView) v.findViewById(R.id.timestampTextView);
+		// chatList = (ListView) v.findViewById(R.id.chatList);
 		imgCall = (ImageView) v.findViewById(R.id.imgCall);
 		final TextView qrCounterTextView = (TextView) v
 				.findViewById(R.id.QuickReplyCounterTextView);
 
-		chatMessages = new ArrayList<ChatMessage>();
+		messageTv.setMovementMethod(new ScrollingMovementMethod());
 
-		chatMessages.add(new ChatMessage(message.getMessageBody(), message
-				.getFormattedTimestamp().toString(), true));
+		SmsPopupActivity.chatMessages.add(new ChatMessage(message
+				.getMessageBody(), message.getFormattedTimestamp().toString(),
+				true));
 
-		adapter = new ChatMessageAdapter(getActivity(), chatMessages);
+		adapter = new ChatMessageAdapter(getActivity(),
+				SmsPopupActivity.chatMessages);
 
-		chatList.setAdapter(adapter);
+		// chatList.setAdapter(adapter);
 
 		imgContactPhoto = (ImageView) v.findViewById(R.id.imgAvatar);
 
@@ -193,9 +196,10 @@ public class SmsPopupFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				sendQuickReply(qrEditText.getText().toString());
-				// mButtonsListener.onButtonClicked(IConstant.TRANFER_CLOSE);
-				addNewMessage(new ChatMessage(qrEditText.getText().toString(),
-						getTimeSender(), false));
+				mButtonsListener.onButtonClicked(IConstant.TRANFER_CLOSE);
+				// addNewMessage(new
+				// ChatMessage(qrEditText.getText().toString(),
+				// getTimeSender(), false));
 				qrEditText.setText("");
 			}
 		});
@@ -238,8 +242,8 @@ public class SmsPopupFragment extends Fragment {
 	 */
 	private void populateViews() {
 		if (message.isSms()) {
-			// messageTv.setText(message.getMessageBody());
-
+			messageTv.setText(formatMessage(message.getMessageBody(), message
+					.getFormattedTimestamp().toString()));
 			quickreplyTextView.setText(message.getContactName());
 		}
 
@@ -252,7 +256,7 @@ public class SmsPopupFragment extends Fragment {
 			imgContactPhoto.setImageBitmap(bm);
 		}
 
-		timestampTv.setText(message.getFormattedTimestamp());
+		// timestampTv.setText(message.getFormattedTimestamp());
 	}
 
 	public Bitmap setPhoto(String phone) {
@@ -579,15 +583,19 @@ public class SmsPopupFragment extends Fragment {
 		// abstract LruCache<Uri, Bitmap> getCache();
 	}
 
-	public static void updateText(String text) {
-		// messageTv.append(text);
+	public static void updateText(String mess, String time) {
+		messageTv.append("\n\n" + formatMessage(mess, time));
 	}
 
-	public static void addNewMessage(ChatMessage m) {
-		chatMessages.add(m);
-		adapter.notifyDataSetChanged();
-		chatList.setSelection(chatMessages.size());
+	public static String formatMessage(String mess, String time) {
+		return "------" + time + "------" + "\n" + mess;
 	}
+
+	// public static void addNewMessage(ChatMessage m) {
+	// SmsPopupActivity.chatMessages.add(m);
+	// adapter.notifyDataSetChanged();
+	// chatList.setSelection(SmsPopupActivity.chatMessages.size());
+	// }
 
 	public String getTimeSender() {
 
